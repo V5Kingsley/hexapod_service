@@ -238,7 +238,7 @@ int main(int argc, char **argv)
   Solution.publishRollTranslationLift(WALL, roll_t, roll_0, translation, height, legs, cycle_length);*/
 
   /*********************后三腿上墙*************************/
-  cycle_length = 4000; //2800
+  cycle_length = 4000; //4000
   //后三腿初始位姿
   for (int leg_index = 0; leg_index < 3; leg_index++)
   {

@@ -94,3 +94,5 @@ JOINT_NAME: [
     leg5_roll, leg5_pitch1, leg5_pitch2, leg5_pitch3, leg5_stick1, leg5_stick3, 
     leg6_roll, leg6_pitch1, leg6_pitch2, leg6_pitch3, leg6_stick1, leg6_stick3
 ]
+
+KPALIMIT: -80

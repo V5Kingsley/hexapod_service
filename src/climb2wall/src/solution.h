@@ -14,6 +14,8 @@
 #include <hexapodservice/hexapodserviceAction.h>
 #include "define.h"
 #include <sensor_msgs/JointState.h>
+#include <link_com/hexcom.h>
+#include <link_com/heartbag.h>
 
 #define GROUND 1
 #define WALL 0
@@ -45,6 +47,8 @@ private:
   hexapodservice::hexapodserviceGoal maxpointsGoal;
   bool bufferFree;   
   bool motionActive;
+  int freeSpace;
+  int sm_point_buf_size;
 
 public:
   double COXA_LENGTH, FEMUR_LENGTH, TIBIA_LENGTH, TARSUS_LENGTH;
@@ -78,14 +82,38 @@ public:
   vector<double> smoothPosBuffer[24];
   void posMeanFilter();
   double meanCalculate(const int bufferIndex, const int i, const int k);
-  void publishSmoothPos();
+  void publishSmoothPos(const int leg_index);
+  void publishPrePressPos();
 
-  bool feedDrviers();
+//六足客户端
+  bool feedDrviers(const int leg_index);
+  bool prePressFeedDrviers();
   bool legControlHalf();
   bool legControlRest();
   void legcontrol_doneCb(const actionlib::SimpleClientGoalState &state, const hexapodservice::hexapodserviceResultConstPtr &result);
   void maxpoint_doneCb(const actionlib::SimpleClientGoalState &state, const hexapodservice::hexapodserviceResultConstPtr &result);
   void maxpointsRequest();
+
+  //吸盘客户端
+  ros::ServiceClient stickClient;
+  link_com::hexcom stickSrv;
+  //心跳包订阅者
+  ros::Subscriber heartbagSub;
+  void heartbagCallBack(const link_com::heartbagConstPtr &heartbag);
+  int io[7];
+  float kpa;
+  float KPALIMIT;
+  bool isStickDone(const int requestIO[]);
+  void stickControl(const int leg_index);
+
+  //反馈rviz角度
+  ros::Subscriber sm_pos_sub;
+  ros::Publisher sm_pos_pub;
+  void sm_pos_Cb(const hexapodservice::legConstPtr &leg);
+  std::vector<std::string> joint_name;
+  sensor_msgs::JointState joint_states;
+
+  
 };
 
 #endif

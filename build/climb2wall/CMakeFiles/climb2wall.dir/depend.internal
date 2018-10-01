@@ -13,6 +13,10 @@ climb2wall/CMakeFiles/climb2wall.dir/src/climb2wall.cpp.o
  /home/quan/hexapod_service_ws/devel/include/hexapodservice/legjoint.h
  /home/quan/hexapod_service_ws/devel/include/hexapodservice/legjoints.h
  /home/quan/hexapod_service_ws/devel/include/hexapodservice/legs.h
+ /home/quan/hexapod_service_ws/devel/include/link_com/heartbag.h
+ /home/quan/hexapod_service_ws/devel/include/link_com/hexcom.h
+ /home/quan/hexapod_service_ws/devel/include/link_com/hexcomRequest.h
+ /home/quan/hexapod_service_ws/devel/include/link_com/hexcomResponse.h
  /home/quan/hexapod_service_ws/src/climb2wall/src/climb2wall.cpp
  /home/quan/hexapod_service_ws/src/climb2wall/src/define.h
  /home/quan/hexapod_service_ws/src/climb2wall/src/solution.h
@@ -115,6 +119,10 @@ climb2wall/CMakeFiles/climb2wall.dir/src/solution.cpp.o
  /home/quan/hexapod_service_ws/devel/include/hexapodservice/legjoint.h
  /home/quan/hexapod_service_ws/devel/include/hexapodservice/legjoints.h
  /home/quan/hexapod_service_ws/devel/include/hexapodservice/legs.h
+ /home/quan/hexapod_service_ws/devel/include/link_com/heartbag.h
+ /home/quan/hexapod_service_ws/devel/include/link_com/hexcom.h
+ /home/quan/hexapod_service_ws/devel/include/link_com/hexcomRequest.h
+ /home/quan/hexapod_service_ws/devel/include/link_com/hexcomResponse.h
  /home/quan/hexapod_service_ws/src/climb2wall/src/define.h
  /home/quan/hexapod_service_ws/src/climb2wall/src/solution.cpp
  /home/quan/hexapod_service_ws/src/climb2wall/src/solution.h

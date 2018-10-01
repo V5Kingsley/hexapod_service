@@ -1,0 +1,8 @@
+prefix=/home/lincoln/catkin_ws/src/rviz_teleop_commander/build/devel
+
+Name: rviz_teleop_commander
+Description: Description of rviz_teleop_commander
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/lincoln/catkin_ws/src/rviz_teleop_commander/build/devel/lib 
+Requires: 

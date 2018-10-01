@@ -1,0 +1,22 @@
+[
+{
+  "directory": "/home/quan/hexapod_service_ws/src/climb2wall/build",
+  "command": "/usr/bin/g++-4.8  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"climb2wall\\\" -I/opt/ros/indigo/include -I/home/quan/hexapod_service_ws/devel/include  -g   -o CMakeFiles/climb2wall.dir/src/climb2wall.cpp.o -c /home/quan/hexapod_service_ws/src/climb2wall/src/climb2wall.cpp",
+  "file": "/home/quan/hexapod_service_ws/src/climb2wall/src/climb2wall.cpp"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/climb2wall/build",
+  "command": "/usr/bin/g++-4.8  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"climb2wall\\\" -I/opt/ros/indigo/include -I/home/quan/hexapod_service_ws/devel/include  -g   -o CMakeFiles/climb2wall.dir/src/solution.cpp.o -c /home/quan/hexapod_service_ws/src/climb2wall/src/solution.cpp",
+  "file": "/home/quan/hexapod_service_ws/src/climb2wall/src/solution.cpp"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/climb2wall/build/gtest",
+  "command": "/usr/bin/g++-4.8  -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgtest_main_EXPORTS -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -o CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /usr/src/gtest/src/gtest_main.cc",
+  "file": "/usr/src/gtest/src/gtest_main.cc"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/climb2wall/build/gtest",
+  "command": "/usr/bin/g++-4.8  -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgtest_EXPORTS -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /usr/src/gtest/src/gtest-all.cc",
+  "file": "/usr/src/gtest/src/gtest-all.cc"
+}
+]

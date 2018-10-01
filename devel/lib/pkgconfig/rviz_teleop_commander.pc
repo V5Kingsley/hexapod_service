@@ -1,0 +1,8 @@
+prefix=/home/quan/hexapod_service_ws/devel
+
+Name: rviz_teleop_commander
+Description: Description of rviz_teleop_commander
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/quan/hexapod_service_ws/devel/lib 
+Requires: 

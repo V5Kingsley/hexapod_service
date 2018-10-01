@@ -1,0 +1,8 @@
+prefix=/home/quan/hexapod_service_ws/devel
+
+Name: climb2wall
+Description: Description of climb2wall
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/quan/hexapod_service_ws/devel/lib 
+Requires: 

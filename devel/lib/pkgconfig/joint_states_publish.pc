@@ -1,0 +1,8 @@
+prefix=/home/quan/hexapod_service_ws/devel
+
+Name: joint_states_publish
+Description: Description of joint_states_publish
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/quan/hexapod_service_ws/devel/lib 
+Requires: 

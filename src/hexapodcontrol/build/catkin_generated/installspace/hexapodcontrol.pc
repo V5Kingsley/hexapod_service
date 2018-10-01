@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: hexapodcontrol
+Description: Description of hexapodcontrol
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: 

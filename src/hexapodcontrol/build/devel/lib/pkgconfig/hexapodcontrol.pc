@@ -1,0 +1,8 @@
+prefix=/home/quan/hexapod_service_ws/src/hexapodcontrol/build/devel
+
+Name: hexapodcontrol
+Description: Description of hexapodcontrol
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/quan/hexapod_service_ws/src/hexapodcontrol/build/devel/lib 
+Requires: 

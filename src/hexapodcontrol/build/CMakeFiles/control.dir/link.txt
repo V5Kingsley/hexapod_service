@@ -1,0 +1,1 @@
+/usr/bin/g++-4.8 -fPIC -g  -shared -Wl,-soname,libcontrol.so -o devel/lib/libcontrol.so CMakeFiles/control.dir/src/control.cpp.o 

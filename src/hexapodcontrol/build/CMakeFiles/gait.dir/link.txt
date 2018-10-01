@@ -1,0 +1,1 @@
+/usr/bin/g++-4.8 -fPIC -g  -shared -Wl,-soname,libgait.so -o devel/lib/libgait.so CMakeFiles/gait.dir/src/gait.cpp.o 

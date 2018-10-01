@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/quan/hexapod_service_ws/src/climb2wall/build/devel/setup.sh

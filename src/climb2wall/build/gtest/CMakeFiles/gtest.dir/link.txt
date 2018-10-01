@@ -1,0 +1,1 @@
+/usr/bin/g++-4.8 -fPIC -g  -shared -Wl,-soname,libgtest.so -o libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o  -L/home/quan/hexapod_service_ws/src/climb2wall/build/gtest/src -Wl,-rpath,/home/quan/hexapod_service_ws/src/climb2wall/build/gtest/src -lpthread 

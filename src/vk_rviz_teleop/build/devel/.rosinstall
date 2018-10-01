@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/lincoln/catkin_ws/src/rviz_teleop_commander/build/devel/setup.sh

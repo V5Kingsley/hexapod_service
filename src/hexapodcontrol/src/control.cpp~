@@ -1,0 +1,261 @@
+/********************************************
+ *          六足话题发布及客户端程序            *
+ *          Copyright (c) V5_Lab, 2018      *
+ *          Author:    Kingsley             *
+ *          Version number:  0.00           *
+ *          Date:                           *
+ * *****************************************/
+
+#include "control.h"
+
+Control::Control(const std::string name, bool spin_thread) : hexapod_client_(name, spin_thread)
+{
+  ros::param::get("NUMBER_OF_LEGS", NUMBER_OF_LEGS);
+  ros::param::get("NUMBER_OF_LEG_SEGMENTS", NUMBER_OF_LEG_JOINTS);
+  ros::param::get("MASTER_LOOP_RATE", MASTER_LOOP_RATE);
+  ros::param::get("VELOCITY_DIVISION", VELOCITY_DIVISION);
+  nh_.param<int>("VkBHexSM/sm_max_point_one_transmit", feedDriver_points_, 300);
+  
+  bufferFree_ = true;
+  motionActive_ = true;
+
+  // Topics we are subscribing
+  cmd_vel_sub_ = nh_.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, &Control::cmd_velCallback, this);
+
+  boost::format roll;
+  boost::format pitch1;
+  boost::format pitch2;
+  boost::format pitch3;
+  for (int leg_index = 0, j = 1; leg_index < NUMBER_OF_LEGS; leg_index++, j++)
+  {
+    roll = boost::format("/hexapod/leg%d_roll_joint_position_controller/command") % j;
+    pitch1 = boost::format("/hexapod/leg%d_pitch1_joint_position_controller/command") % j;
+    pitch2 = boost::format("/hexapod/leg%d_pitch2_joint_position_controller/command") % j;
+    pitch3 = boost::format("/hexapod/leg%d_pitch3_joint_position_controller/command") % j;
+    leg_topic[leg_index] = roll.str();
+    leg_topic[leg_index + 1] = pitch1.str();
+    leg_topic[leg_index + 2] = pitch2.str();
+    leg_topic[leg_index + 3] = pitch3.str();
+    leg_roll_p[leg_index] = nh_.advertise<std_msgs::Float64>(leg_topic[leg_index], 10);
+    leg_pitch1_p[leg_index] = nh_.advertise<std_msgs::Float64>(leg_topic[leg_index + 1], 10);
+    leg_pitch2_p[leg_index] = nh_.advertise<std_msgs::Float64>(leg_topic[leg_index + 2], 10);
+    leg_pitch3_p[leg_index] = nh_.advertise<std_msgs::Float64>(leg_topic[leg_index + 3], 10);
+  }
+
+  linear_x_max = 0.1;
+  linear_y_max = 0.1;
+  angular_z_max = 0.5;
+
+  feet_position = nh_.advertise<hexapod_msgs::FeetPositions>("feet_position", 10);
+}
+
+void Control::robotInit()
+{
+  //关节转动角度
+  for (int leg_index = 0; leg_index < NUMBER_OF_LEGS; leg_index++)
+  {
+    leg_roll[leg_index].data = 0.0;
+    leg_pitch1[leg_index].data = 0.0;
+    leg_pitch2[leg_index].data = 0.0;
+    leg_pitch3[leg_index].data = 0.0;
+  }
+  for (int leg_index = 0; leg_index < NUMBER_OF_LEGS; leg_index++)
+  {
+    leg_roll_p[leg_index].publish(leg_roll[leg_index]);
+    leg_pitch1_p[leg_index].publish(leg_pitch1[leg_index]);
+    leg_pitch2_p[leg_index].publish(leg_pitch2[leg_index]);
+    leg_pitch3_p[leg_index].publish(leg_pitch3[leg_index]);
+  }
+}
+
+//订阅发布的速度信息
+void Control::cmd_velCallback(const geometry_msgs::TwistConstPtr &cmd_vel_msg)
+{
+  if (cmd_vel_msg->linear.x > linear_x_max || cmd_vel_msg->linear.x < -linear_x_max)
+  {
+    ROS_FATAL("The linear.x exceeds the upper limit, set it to max: %f.", linear_x_max);
+    cmd_vel_incoming_.linear.x = (cmd_vel_msg->linear.x > 0 ? linear_x_max : -linear_x_max);
+  }
+  else
+  {
+    cmd_vel_incoming_.linear.x = cmd_vel_msg->linear.x;
+  }
+
+  if (cmd_vel_msg->linear.y > linear_y_max || cmd_vel_msg->linear.y < -linear_y_max)
+  {
+    ROS_FATAL("The linear.y exceeds the upper limit, set it to max: %f.", linear_y_max);
+    cmd_vel_incoming_.linear.y = (cmd_vel_msg->linear.y > 0 ? linear_y_max : -linear_y_max);
+    ;
+  }
+  else
+  {
+    cmd_vel_incoming_.linear.y = cmd_vel_msg->linear.y;
+  }
+
+  if (cmd_vel_msg->angular.z > angular_z_max || cmd_vel_msg->angular.z < -angular_z_max)
+  {
+    ROS_FATAL("The angular.z exceeds the upper limit, set it to max: %f.", angular_z_max);
+    cmd_vel_incoming_.angular.z = (cmd_vel_msg->angular.z > 0 ? angular_z_max : -angular_z_max);
+  }
+  else
+  {
+    cmd_vel_incoming_.angular.z = cmd_vel_msg->angular.z;
+  }
+}
+
+//速度转化成歩幅
+void Control::partitionCmd_vel(geometry_msgs::Twist *cmd_vel)
+{
+  // Instead of getting delta time we are calculating with a static division
+  double dt = VELOCITY_DIVISION;
+
+  double delta_th = cmd_vel_incoming_.angular.z * dt;
+  double delta_x = (cmd_vel_incoming_.linear.x * cos(delta_th) - cmd_vel_incoming_.linear.y * sin(delta_th)) * dt;
+  double delta_y = (cmd_vel_incoming_.linear.x * sin(delta_th) + cmd_vel_incoming_.linear.y * cos(delta_th)) * dt;
+  cmd_vel->linear.x = delta_x;
+  cmd_vel->linear.y = delta_y;
+  cmd_vel->angular.z = delta_th;
+}
+
+//向服务器请求maxpoints，填充buffer
+void Control::feedDrives(const bool &start_cycle, const int &origin_period_, const bool &is_traveling_)
+{
+  //feedDriver条件： 所给的六足速度不为0或者给的速度为0但六足仍在运动（复位周期）
+  if ((cmd_vel_incoming_.linear.x != 0 || cmd_vel_incoming_.linear.y != 0 || cmd_vel_incoming_.angular.z != 0) || is_traveling_ == true)
+  {
+    //status不为1或者abortMotion时，关闭算法节点
+    if (motionActive_ == false)
+    {
+      ros::shutdown();
+      return;
+    }
+
+    if (bufferFree_) /*当buffer空间充足，即大于sm_max_point_one_transmit，填充buffer*/
+    {
+      maxpoints_ = feedDriver_points_; //固定每次填充buffer点数
+      ROS_INFO("maxpoints: %d", maxpoints_);
+
+      //每个关节的填充buffer数值初始化
+      for (int position_resize = 0; position_resize < 6; position_resize++)
+      {
+        leg_goal_.ALLLEGS.leg[position_resize].coxa.resize(maxpoints_);
+        leg_goal_.ALLLEGS.leg[position_resize].femur.resize(maxpoints_);
+        leg_goal_.ALLLEGS.leg[position_resize].tibia.resize(maxpoints_);
+        leg_goal_.ALLLEGS.leg[position_resize].tarsus.resize(maxpoints_);
+      }
+
+      //调用maxpoints次算法
+      for (int i = 0; i < maxpoints_; i++)
+      {
+        partitionCmd_vel(&cmd_vel_);
+        gait.gaitCycle(cmd_vel_, &feet_);
+        ik.calculateIK(feet_, &legs_);
+
+        for (int leg_index = 0; leg_index < 6; leg_index++)
+        {
+          leg_goal_.ALLLEGS.leg[leg_index].coxa[i] = round(4096.0 * (3005640.0 / 1300.0) * (legs_.leg[leg_index].coxa / M_PI * 180.0) / 360.0);
+          leg_goal_.ALLLEGS.leg[leg_index].femur[i] = round(4096.0 * (3005640.0 / 1300.0) * (-legs_.leg[leg_index].femur / M_PI * 180.0) / 360.0);
+          leg_goal_.ALLLEGS.leg[leg_index].tibia[i] = round(4096.0 * (3005640.0 / 1300.0) * (-legs_.leg[leg_index].tibia / M_PI * 180.0) / 360.0);
+          leg_goal_.ALLLEGS.leg[leg_index].tarsus[i] = round(4096.0 * (3005640.0 / 1300.0) * (-legs_.leg[leg_index].tarsus / M_PI * 180.0) / 360.0);
+        }
+      }
+
+      //发送关节运动控制请求
+      leg_goal_.MODE = ALLLEGS_CONTROL;
+      leg_goal_.MAXPOINTS = maxpoints_;
+      bool server_exists = hexapod_client_.waitForServer(ros::Duration(5.0));
+      while (!server_exists) //查看服务器是否开启
+      {
+        ROS_WARN("could not connect to server, retrying...");
+        server_exists = hexapod_client_.waitForServer(ros::Duration(5.0));
+      }
+      hexapod_client_.sendGoal(leg_goal_, boost::bind(&Control::legcontrol_doneCb, this, _1, _2));
+
+      bool finished = hexapod_client_.waitForResult(ros::Duration(5.0));
+      if (!finished) //未在规定时间发送成功时，关闭算法节点
+      {
+        ROS_WARN("Waiting for result...");
+        finished = hexapod_client_.waitForResult(ros::Duration(5.0));
+        if (!finished)
+        {
+          ROS_WARN("Connecting failed.");
+          ros::shutdown();
+          return;  
+        }
+      }
+    }
+    else /*buffer空间不足时，请求maxpoints，直至sm反馈buffer空间充足*/
+    {
+      maxpoints_goal_.MODE = MAXPOINT_REQUEST;
+
+      bool server_exists = hexapod_client_.waitForServer(ros::Duration(5.0));
+      while (!server_exists)
+      {
+        ROS_WARN("Could not connect to hexapod server, retrying...");
+        server_exists = hexapod_client_.waitForServer(ros::Duration(5.0));
+      }
+      hexapod_client_.sendGoal(maxpoints_goal_, boost::bind(&Control::maxpoint_doneCb, this, _1, _2));
+
+      bool finished = hexapod_client_.waitForResult(ros::Duration(5.0));
+      if (!finished)
+      {
+        ROS_WARN("Waiting for result...");
+        finished = hexapod_client_.waitForResult(ros::Duration(5.0));
+        if (!finished)
+        {
+          ROS_WARN("Connecting failed.");
+          ros::shutdown();
+          return;
+        }
+      }
+    }
+  }
+}
+
+//关节控制回调函数，确认六足status/freespace/motionActive
+void Control::legcontrol_doneCb(const actionlib::SimpleClientGoalState &state, const hexapodservice::hexapodserviceResultConstPtr &result)
+{
+  ROS_INFO("Leg control: server responded with state[%s]", state.toString().c_str());
+  motionActive_ = result->motionActive;
+  status_ = result->status;
+  freeSpace_ = result->freespace;
+
+  if (status_ != 1)
+  {
+    ROS_WARN("simplemotion status fault, status: %d", status_);
+    motionActive_ = false;
+  }
+
+  if (freeSpace_ < feedDriver_points_)
+  {
+    bufferFree_ = false;
+  }
+  else
+  {
+    bufferFree_ = true;
+  }
+}
+
+//读取最大填充点回调函数
+void Control::maxpoint_doneCb(const actionlib::SimpleClientGoalState &state, const hexapodservice::hexapodserviceResultConstPtr &result)
+{
+  ROS_INFO("Request maxpoint: server responded with state[%s]", state.toString().c_str());
+  motionActive_ = result->motionActive;
+  status_ = result->status;
+  freeSpace_ = result->freespace;
+
+  if (status_ != 1)
+  {
+    ROS_WARN("simplemotion status fault, status: %d", status_);
+    motionActive_ = false;
+  }
+
+  if (freeSpace_ < feedDriver_points_)
+  {
+    bufferFree_ = false;
+  }
+  else
+  {
+    bufferFree_ = true;
+  }
+}

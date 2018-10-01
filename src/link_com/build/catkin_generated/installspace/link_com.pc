@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: link_com
+Description: Description of link_com
+Version: 0.0.0
+Cflags: -I/usr/local/include
+Libs: -L/usr/local/lib -llink_com
+Requires: message_runtime roscpp rospy std_msgs

@@ -1,0 +1,1 @@
+set(ORDERED_PATHS "/opt/ros/indigo/include;/usr/include/eigen3;/usr/include/OGRE;/usr/include;/usr/include/opencv")

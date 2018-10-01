@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: hexapodservice
+Description: Description of hexapodservice
+Version: 0.0.0
+Cflags: -I/usr/local/include
+Libs: -L/usr/local/lib -lhexapodservice
+Requires: roscpp rospy std_msgs message_runtime

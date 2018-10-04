@@ -67,6 +67,9 @@ Solution::Solution(const std::string name, bool spin_thread) : hexapodClient(nam
 
   bufferFree = true;
   motionActive = true;
+
+  stickClient = nh_.serviceClient<link_com::hexcom>("hexapod_st_service");
+  heartbagSub = nh_.subscribe<link_com::heartbag>("/hexapod_st_heartbag", 1, &Solution::heartbagCallBack, this);
 }
 
 /******************************************************
@@ -652,7 +655,7 @@ void Solution::rightLeg2Wall(const int leg_index, const geometry_msgs::Point &in
     publishJointStates(legs);
     //  ros::Duration(0.005).sleep();
 
-    if (cycle_period < 0.4 * cycle_length || cycle_period > 0.8 * cycle_length)
+    if (cycle_period < 0.5 * cycle_length || cycle_period > 0.8 * cycle_length)
       cycle_period += 2;
     else
       cycle_period += 0.5;
@@ -710,7 +713,76 @@ void Solution::prePress(const int leg_index, const double &prePress, const doubl
     // ros::Duration(0.005).sleep();
   }
   posMeanFilter();
-  publishSmoothPos(leg_index);
+  publishPrePressPos();
+}
+
+void Solution::leg2SpecialPrePress(const int leg_index, const double &prePress, const double &roll, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
+{
+  {
+    hexapod_msgs::LegJoints initLeg; //缓存初始关节角
+    initLeg.coxa = legs.leg[leg_index].coxa;
+    initLeg.femur = legs.leg[leg_index].femur;
+    initLeg.tibia = legs.leg[leg_index].tibia;
+    initLeg.tarsus = legs.leg[leg_index].tarsus;
+    bool flag = true;
+
+    for (int cycle_period = 0; cycle_period <= cycle_length; cycle_period++)
+    {
+      double interFuncX;
+      double foot2foot_x;
+
+      if (cycle_period <= 0.5 * cycle_length)
+      {
+        interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) + 0.5;
+        foot2foot_x = (prePress + 0.02) * interFuncX;
+      }
+      else
+      {
+        if (flag)
+        {
+          initLeg.coxa = legs.leg[leg_index].coxa;
+          initLeg.femur = legs.leg[leg_index].femur;
+          initLeg.tibia = legs.leg[leg_index].tibia;
+          initLeg.tarsus = legs.leg[leg_index].tarsus;
+          flag = false;
+        }
+        interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) - 0.5;
+        foot2foot_x = prePress * interFuncX;
+      }
+
+      double foot2foot_y = 0;
+
+      double A = FEMUR_LENGTH * sin(initLeg.tibia + initLeg.tarsus) + TIBIA_LENGTH * cos(initLeg.tarsus) + foot2foot_x;
+      double B = FEMUR_LENGTH * cos(initLeg.tibia + initLeg.tarsus) - TIBIA_LENGTH * sin(initLeg.tarsus) + foot2foot_y;
+      double C = FEMUR_LENGTH;
+      double D = TIBIA_LENGTH;
+
+      double temp = 4.0 * pow(C, 2) * pow(D, 2) - pow((A * A + B * B - C * C - D * D), 2);
+      temp = temp > 0 ? temp : 0;
+
+      double x = 2.0 * atan(
+                           (2.0 * A * C - sqrt(temp)) /
+                           (A * A + pow((B + C), 2) - D * D));
+
+      double y = 2.0 * atan(
+                           (-2.0 * B * D + sqrt(temp)) /
+                           (pow((A + D), 2) + B * B - C * C));
+
+      double beta = (1.0 + sign[leg_index]) / 2.0 * M_PI / 2.0;
+
+      legs.leg[leg_index].coxa = sign[leg_index] * M_PI / 2 - INIT_COXA_ANGLE[leg_index];
+      legs.leg[leg_index].femur = beta - sign[leg_index] * roll - x;
+      legs.leg[leg_index].tibia = x - y;
+      legs.leg[leg_index].tarsus = y;
+
+      legSafeControl(legs.leg[leg_index]);
+
+      publishJointStates(legs);
+      // ros::Duration(0.005).sleep();
+    }
+    posMeanFilter();
+    publishPrePressPos();
+  }
 }
 
 /************************************
@@ -818,7 +890,7 @@ double Solution::meanCalculate(const int bufferIndex, const int i, const int k)
 
 void Solution::publishSmoothPos(const int leg_index)
 {
-  /*for (int i = 0; i < smoothPosBuffer[0].size(); i++)
+  /* for (int i = 0; i < smoothPosBuffer[0].size(); i++)
   {
     for (int leg = 0; leg < 6; leg++)
     {
@@ -876,7 +948,7 @@ bool Solution::feedDrviers(const int leg_index)
 {
   maxpointsRequest();
 
-  while (freeSpace < (sm_point_buf_size - 300))  //sm服务器buffer接近空时，进行吸盘控制
+  while (freeSpace < (sm_point_buf_size - 30)) //sm服务器buffer接近空时，进行吸盘控制
   {
     ros::Duration(3).sleep();
     maxpointsRequest();
@@ -888,6 +960,8 @@ bool Solution::feedDrviers(const int leg_index)
     ros::shutdown();
     return false;
   }
+
+  ros::Duration(2).sleep();
 
   stickControl(leg_index); //吸盘控制
 
@@ -921,7 +995,7 @@ bool Solution::prePressFeedDrviers()
 
   maxpointsRequest();
 
-  while (freeSpace < (sm_point_buf_size - 300))  //sm服务器buffer接近空时，进行吸盘控制
+  while (freeSpace < (sm_point_buf_size - 30)) //sm服务器buffer接近空时，进行吸盘控制
   {
     ros::Duration(2).sleep();
     maxpointsRequest();
@@ -951,7 +1025,6 @@ bool Solution::prePressFeedDrviers()
   }
   ROS_INFO("%s, request io: %d, %d, %d, %d, %d, %d", stickSrv.response.back.c_str(), requestIO[0], requestIO[1], requestIO[2], requestIO[3], requestIO[4], requestIO[5]);
 
-
   if (legControlHalf() != true) //发送前半个周期给服务器
     return false;
 
@@ -970,6 +1043,7 @@ bool Solution::prePressFeedDrviers()
     return false;
   }
 
+  ros::Duration(5.0).sleep(); //确保气压从80以上降到80以下再回升
   //查看吸盘是否吸气完成
   while (!isStickDone(requestIO))
   {

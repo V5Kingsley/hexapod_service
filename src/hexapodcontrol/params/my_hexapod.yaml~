@@ -5,7 +5,7 @@
 NON_TELEOP: false
 
 # Speed limit in Hz for the master loop rate
-MASTER_LOOP_RATE: 10
+MASTER_LOOP_RATE: 1
 
 # Static time division to convert cmd_vel into segments for controller loop
 VELOCITY_DIVISION: 0.5
@@ -69,7 +69,7 @@ COMPENSATE_INCREMENT: !degrees 0.01
 COMPENSATE_TO_WITHIN: !degrees 1
 
 # Gait Settings
-CYCLE_LENGTH: 2000
+CYCLE_LENGTH: 2500
 #LEG_LIFT_HEIGHT: 0.038
 #MAX_LIFT_HEIGHT: 0.050
 LEG_LIFT_HEIGHT: 0.1
@@ -99,3 +99,5 @@ JOINT_NAME: [
 LINEAR_X_MAX: 0.1
 LINEAR_Y_MAX: 0.1
 ANGULAR_Z_MAX: 0.3
+
+KPALIMIT: -60.0

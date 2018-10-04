@@ -200,9 +200,9 @@ void Control::feedDrives(const bool &start_cycle, const int &cycle_period_, cons
           return;
         }
       }
-      
 
-      if (stick_control_)
+      //  if (stick_control_)
+      if (false)
       {
         ROS_INFO("------stick control-------");
         ROS_INFO("io: %d, %d, %d, %d, %d, %d", cycle_leg_number_[0], cycle_leg_number_[1], cycle_leg_number_[2], cycle_leg_number_[3], cycle_leg_number_[4], cycle_leg_number_[5]);
@@ -239,7 +239,7 @@ void Control::feedDrives(const bool &start_cycle, const int &cycle_period_, cons
         ROS_INFO("---Buffer is almost empty. Start to control stick---");
         int Reqio[7];
 
-        if (hexapod_stop_flag == true)    /*当六足停止时，把所有吸盘都抽至真空*/
+        if (hexapod_stop_flag == true) /*当六足停止时，把所有吸盘都抽至真空*/
         {
           /*****把所有的吸盘与真空泵连接*****/
           stick_srv_.request.chose = 2;
@@ -266,14 +266,14 @@ void Control::feedDrives(const bool &start_cycle, const int &cycle_period_, cons
 
           if (hexapod_stop_flag == true)
           {
-            partitionCmd_vel(&cmd_vel_);       /*走完下一个点使得is_traveling 和smooth_base更新*/
+            partitionCmd_vel(&cmd_vel_); /*走完下一个点使得is_traveling 和smooth_base更新*/
             gait.gaitCycle(cmd_vel_, &feet_);
             ik.calculateIK(feet_, &legs_);
-            while (hexapod_stop_flag == true)   /*当新的速度到来时才跳出循环*/
+            while (hexapod_stop_flag == true) /*当新的速度到来时才跳出循环*/
             {
               if (std::abs(cmd_vel_incoming_.linear.x) > 0.001 || std::abs(cmd_vel_incoming_.linear.y) > 0.001 || std::abs(cmd_vel_incoming_.angular.z) > 0.001)
               {
-                hexapod_stop_flag = false;   //六足停止标志位复位
+                hexapod_stop_flag = false; //六足停止标志位复位
                 break;
               }
               ros::Duration(1.0).sleep();

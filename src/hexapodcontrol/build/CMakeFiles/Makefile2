@@ -68,8 +68,8 @@ CMAKE_BINARY_DIR = /home/quan/hexapod_service_ws/src/hexapodcontrol/build
 # Target rules for target CMakeFiles/hexapodcontrol.dir
 
 # All Build rule for target.
-CMakeFiles/hexapodcontrol.dir/all: CMakeFiles/gait.dir/all
 CMakeFiles/hexapodcontrol.dir/all: CMakeFiles/ik.dir/all
+CMakeFiles/hexapodcontrol.dir/all: CMakeFiles/gait.dir/all
 	$(MAKE) -f CMakeFiles/hexapodcontrol.dir/build.make CMakeFiles/hexapodcontrol.dir/depend
 	$(MAKE) -f CMakeFiles/hexapodcontrol.dir/build.make CMakeFiles/hexapodcontrol.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/quan/hexapod_service_ws/src/hexapodcontrol/build/CMakeFiles --progress-num=7,8,9 "Built target hexapodcontrol"

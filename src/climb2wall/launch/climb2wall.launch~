@@ -4,8 +4,9 @@
 <launch>
 
   <arg name="config" default="my_hexapod"/>
-  <rosparam command="load" file="$(find climb)/params/$(arg config).yaml"/>
-  <!--<node name ="climb_test" pkg="climb" type="climb_test" output="screen"/>-->
+  <rosparam command="load" file="$(find climb2wall)/params/$(arg config).yaml"/>
+  <rosparam command="load" file"$(find climb2wall)/params/BigHexBalance.yaml"/>
+ <!-- <node name ="climb2wall" pkg="climb2wall" type="climb2wall" output="screen"/>-->
   <node name="turtle" pkg="turtlesim" type="turtle_teleop_key" output="screen"/>
 
 </launch>

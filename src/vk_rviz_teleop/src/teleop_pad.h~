@@ -22,7 +22,7 @@
 */
 
 #include <actionlib/client/simple_action_client.h>
-#include <hexapod/hexapodserviceAction.h>
+#include <hexapodservice/hexapodserviceAction.h>
 #include <std_msgs/Int32.h>
 #include "../include/define.h"
 

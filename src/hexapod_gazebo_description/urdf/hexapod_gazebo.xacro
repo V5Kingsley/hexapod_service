@@ -13,19 +13,19 @@
   <xacro:property name="bridgemass" value="0.5"/>
 
   <xacro:property name="rolllength" value="0.093"/>
-  <xacro:property name="rollradius" value="0.03"/>  
+  <xacro:property name="rollradius" value="0.025"/>  
   <xacro:property name="rollmass" value="${rolllength*5}"/>
 
   <xacro:property name="pitch1length" value="0.14489"/>
-  <xacro:property name="pitch1radius" value="0.03"/>
+  <xacro:property name="pitch1radius" value="0.025"/>
   <xacro:property name="pitch1mass" value="${pitch1length*5}"/>
 
   <xacro:property name="pitch2length" value="0.164"/>
-  <xacro:property name="pitch2radius" value="0.03"/>
+  <xacro:property name="pitch2radius" value="0.025"/>
   <xacro:property name="pitch2mass" value="${pitch2length*5}"/>
 
   <xacro:property name="pitch3length" value="0.157"/>
-  <xacro:property name="pitch3radius" value="0.03"/>
+  <xacro:property name="pitch3radius" value="0.025"/>
   <xacro:property name="pitch3mass" value="${pitch3length*5}"/>
   
   <xacro:property name="sticklength" value="0.01"/>
@@ -33,6 +33,10 @@
   <xacro:property name="stickmass" value="1"/>
 
   <xacro:property name="damping" value="1"/>
+
+  <xacro:property name="scale" value="10"/>
+  <xacro:property name="holelength" value="0.022"/>
+
 
  
 
@@ -51,12 +55,15 @@
 <!--body-->
 <link name="body">
 <visual>
+   <origin xyz="-${bodyradius} ${bodyradius} 0" rpy="${M_PI/2} 0 0"/>
    <geometry>
-     <cylinder length="${bodylength}" radius="${bodyradius}"/>
+  <!--   <cylinder length="${bodylength}" radius="${bodyradius}"/>-->
+     <mesh filename="package://hexapod_gazebo_description/meshes/hexapod.stl" scale="0.001 0.001 0.001"/>
    </geometry>
-   <material name="Red">
-     <color rgba="255 0 0 100"/>
-   </material>
+
+    <material name="Black">
+     <color rgba="0 0 0 1"/>
+    </material>
   </visual>
    
  <collision>
@@ -122,18 +129,19 @@
   <axis xyz="0 0 1"/>
   <parent link="body"/>
   <child link="${leg}_bridge"/>
-  <origin rpy="${r} ${p} ${ry}" xyz="${x} ${y} 0"/>
+  <origin rpy="${r} ${p} ${ry}" xyz="${x} ${y} ${holelength/2}"/>
 </joint>
 
 
 <link name="${leg}_roll">
   <visual>
-    <origin xyz="${rolllength/2} 0 0" rpy="0 ${M_PI/2} 0"/>
+    <origin xyz="-${holelength} ${rollradius} -${rollradius}" rpy="0 0 -${M_PI/2}"/>
     <geometry>
-      <cylinder length="${rolllength}" radius="${rollradius}"/>
+    <!--  <cylinder length="${rolllength}" radius="${rollradius}"/>-->
+      <mesh filename="package://hexapod_gazebo_description/meshes/coxa.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="Black">
-      <color rgba="0 0 0 1"/>
+    <material name="Red">
+     <color rgba="255 0 0 1"/>
     </material>
   </visual>
   <inertial>
@@ -157,7 +165,7 @@
 
 <joint name="${leg}_roll" type="revolute">
   <axis xyz="0 0 1"/>
-  <limit effort="300" lower="-${M_PI/4}" upper="${M_PI/4}" velocity="1"/>
+  <limit effort="300" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="1"/>
   <dynamics damping="${damping}"/>
   <parent link="${leg}_bridge"/>
   <child link="${leg}_roll"/>
@@ -168,12 +176,13 @@
 
 <link name="${leg}_pitch1">
   <visual>
-    <origin xyz="${pitch1length/2} 0 0" rpy="0 ${M_PI/2} 0"/>
+    <origin xyz="-${holelength} -${holelength} -${pitch1radius/2}" rpy="0 -${M_PI/2} -${M_PI/2}"/>
     <geometry>
-      <cylinder length="${pitch1length}" radius="${pitch1radius}"/>
+     <!-- <cylinder length="${pitch1length}" radius="${pitch1radius}"/>-->
+      <mesh filename="package://hexapod_gazebo_description/meshes/femur.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="Red">
-      <color rgba="255 0 0 1"/>
+    <material name="Black">
+     <color rgba="0 0 0 0.8"/>
     </material>
   </visual>
  <inertial>
@@ -196,7 +205,7 @@
   </gazebo>
 <joint name="${leg}_pitch1" type="revolute">
   <axis xyz="0 0 1"/>
-  <limit effort="300" lower="-${M_PI/3*2}" upper="${M_PI/2}" velocity="1"/>
+  <limit effort="300" lower="-${M_PI/2*3}" upper="${M_PI/2}" velocity="1"/>
   <dynamics damping="${damping}"/>
   <parent link="${leg}_roll"/>
   <child link="${leg}_pitch1"/>
@@ -205,12 +214,13 @@
 
 <link name="${leg}_pitch2">
   <visual>
-    <origin xyz="${pitch2length/2} 0 0" rpy="${M_PI/2} 0 ${M_PI/2}"/>
+    <origin xyz="${pitch2length+holelength} -${holelength} ${holelength}" rpy="0 ${M_PI/2} ${M_PI/2}"/>
     <geometry>
-      <cylinder length="${pitch2length}" radius="${pitch2radius}"/>
+  <!--    <cylinder length="${pitch2length}" radius="${pitch2radius}"/>-->
+     <mesh filename="package://hexapod_gazebo_description/meshes/tibia.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="black">
-      <color rgba="0 0 0 1"/>
+    <material name="Red">
+     <color rgba="255 0 0 1"/>
     </material>
   </visual>
  <inertial>
@@ -235,7 +245,7 @@
   </gazebo>
 <joint name="${leg}_pitch2" type="revolute">
   <axis xyz="0 0 1"/>
-  <limit effort="300" lower="-${M_PI/3}" upper="${M_PI/2}" velocity="1"/>
+  <limit effort="300" lower="-${M_PI*2/3}" upper="${M_PI}" velocity="1"/>
   <dynamics damping="${damping}"/>
   <parent link="${leg}_pitch1"/>
   <child link="${leg}_pitch2"/>
@@ -244,12 +254,13 @@
 
 <link name="${leg}_pitch3">
   <visual>
-    <origin xyz="${pitch3length/2} 0 0" rpy="${M_PI/2} 0 ${M_PI/2}"/>
+    <origin xyz="-${holelength} -${stickradius} ${stickradius}" rpy="0 ${M_PI/2} 0"/>
     <geometry>
-      <cylinder length="${pitch3length}" radius="${pitch3radius}"/>
+    <!--  <cylinder length="${pitch3length}" radius="${pitch3radius}"/>-->
+      <mesh filename="package://hexapod_gazebo_description/meshes/tarsus.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="Red">
-      <color rgba="255 0 0 1"/>
+    <material name="Black">
+     <color rgba="0 0 0 0.5"/>
     </material>
   </visual>
  <inertial>
@@ -274,7 +285,7 @@
   </gazebo>
 <joint name="${leg}_pitch3" type="revolute">
   <axis xyz="0 0 1"/>
-  <limit effort="300" lower="-${M_PI/3}" upper="${M_PI/2}" velocity="1"/>
+  <limit effort="300" lower="-${M_PI*2/3}" upper="${M_PI/2}" velocity="1"/>
   <dynamics damping="${damping}"/>
   <parent link="${leg}_pitch2"/>
   <child link="${leg}_pitch3"/>
@@ -289,8 +300,8 @@
     <geometry>
       <cylinder length="0.01" radius="0.01"/>
     </geometry>
-    <material name="yellow">
-      <color rgba="255 255 0 1"/>
+    <material name="Black">
+     <color rgba="0 0 0 1"/>
     </material>
   </visual>
  <inertial>
@@ -309,14 +320,55 @@
   </collision>
 </link>
 <joint name="${leg}_stick1" type="revolute">
-  <limit effort="300" lower="-${M_PI/7}" upper="${M_PI/7}" velocity="1"/>
+  <limit effort="300" lower="0" upper="0" velocity="1"/>
+  <!--limit effort="300" lower="-${M_PI}" upper="${M_PI}" velocity="1"/-->
   <dynamics damping="${damping}"/>
-  <axis xyz="1 0 0"/>
+  <axis xyz="0 0 1"/>
   <parent link="${leg}_pitch3"/>
   <child link="${leg}_stick1"/>
-  <origin rpy="0 ${M_PI/2} 0" xyz="${pitch2length+sticklength/2} 0 0"/>
+  <origin rpy="0 ${M_PI/2} 0" xyz="${pitch2length-holelength} 0 0"/>
 </joint>
   <gazebo reference="${leg}_stick1">
+    <material>Gazebo/Black</material>
+    <mu1 value="10000"/>
+    <mu2 value="10000"/>
+  </gazebo>
+
+<link name="${leg}_stick2">
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <cylinder length="0.01" radius="0.01"/>
+    </geometry>
+    <material name="Black">
+     <color rgba="0 0 0 1"/>
+    </material>
+  </visual>
+ <inertial>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${stickmass}"/>
+      <inertia
+        ixx="${(3*stickmass*stickradius*stickradius+4*stickmass*sticklength*sticklength)/12}" ixy="0.0" ixz="0.0"
+        iyy="${(3*stickmass*stickradius*stickradius+4*stickmass*sticklength*sticklength)/12}" iyz="0.0"
+        izz="${0.5*stickmass*stickradius*stickradius}"/>
+    </inertial>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <cylinder length="${sticklength}" radius="${stickradius}"/>
+    </geometry>
+  </collision>
+</link>
+<joint name="${leg}_stick2" type="revolute">
+  <limit effort="300" lower="0" upper="0" velocity="1"/>
+  <!--limit effort="300" lower="-${M_PI/7}" upper="${M_PI/7}" velocity="1"/-->
+  <dynamics damping="${damping}"/>
+  <axis xyz="1 0 0"/>
+  <parent link="${leg}_stick1"/>
+  <child link="${leg}_stick2"/>
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+</joint>
+  <gazebo reference="${leg}_stick3">
     <material>Gazebo/Black</material>
     <mu1 value="10000"/>
     <mu2 value="10000"/>
@@ -326,10 +378,10 @@
   <visual>
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
-      <cylinder length="${sticklength}" radius="${stickradius}"/>
+      <cylinder length="${sticklength}" radius="${0.01}"/>
     </geometry>
-    <material name="Black">
-      <color rgba="0 0 0 1"/>
+    <material name="Red">
+     <color rgba="255 0 0 1"/>
     </material>
   </visual>
  <inertial>
@@ -348,46 +400,8 @@
   </collision>
 </link>
 <joint name="${leg}_stick3" type="revolute">
-  <limit effort="300" lower="-${M_PI/7}" upper="${M_PI/7}" velocity="1"/>
-  <dynamics damping="${damping}"/>
-  <axis xyz="0 1 0"/>
-  <parent link="${leg}_stick1"/>
-  <child link="${leg}_stick3"/>
-  <origin rpy="0 0 0" xyz="0 0 0"/>
-</joint>
-  <gazebo reference="${leg}_stick3">
-    <material>Gazebo/Black</material>
-    <mu1 value="10000"/>
-    <mu2 value="10000"/>
-  </gazebo>
-
-<!--<link name="${leg}_stick3">
-  <visual>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <geometry>
-      <cylinder length="${sticklength}" radius="${stickradius}"/>
-    </geometry>
-    <material name="Black">
-      <color rgba="0 0 0 1"/>
-    </material>
-  </visual>
- <inertial>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="${stickmass}"/>
-      <inertia
-        ixx="${(3*stickmass*stickradius*stickradius+4*stickmass*sticklength*sticklength)/12}" ixy="0.0" ixz="0.0"
-        iyy="${(3*stickmass*stickradius*stickradius+4*stickmass*sticklength*sticklength)/12}" iyz="0.0"
-        izz="${0.5*stickmass*stickradius*stickradius}"/>
-    </inertial>
-  <collision>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <geometry>
-      <cylinder length="${sticklength}" radius="${stickradius}"/>
-    </geometry>
-  </collision>
-</link>
-<joint name="${leg}_stick3" type="revolute">
-  <limit effort="300" lower="-${M_PI/7}" upper="${M_PI/7}" velocity="1"/>
+  <limit effort="300" lower="0" upper="0" velocity="1"/>
+  <!--limit effort="300" lower="-${M_PI/7}" upper="${M_PI/7}" velocity="1"/-->
   <dynamics damping="${damping}"/>
   <axis xyz="0 1 0"/>
   <parent link="${leg}_stick2"/>
@@ -398,7 +412,7 @@
     <material>Gazebo/Black</material>
     <mu1 value="100000"/>
     <mu2 value="100000"/>
-  </gazebo>-->
+  </gazebo>
 
 
 <!--motor-->
@@ -458,7 +472,7 @@
   </transmission>
 <transmission name="${leg}_tran6">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="${leg}_stick3">
+    <joint name="${leg}_stick2">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="${leg}_motor6">
@@ -466,7 +480,7 @@
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
-<!--<transmission name="${leg}_tran7">
+<transmission name="${leg}_tran7">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="${leg}_stick3">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
@@ -475,12 +489,12 @@
       <hardwareInterface>EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
-  </transmission>-->
+  </transmission>
 
 
   <gazebo>
      <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
-       <jointName>${leg}_roll, ${leg}_pitch1, ${leg}_pitch2,${leg}_pitch3, ${leg}_stick1, ${leg}_stick3</jointName>
+       <jointName>${leg}_roll, ${leg}_pitch1, ${leg}_pitch2,${leg}_pitch3, ${leg}_stick1, ${leg}_stick2, ${leg}_stick3</jointName>
      </plugin>
   </gazebo>
 </xacro:macro>
@@ -493,12 +507,12 @@
      </plugin>
   </gazebo>
 
-<xacro:leg leg="leg1" r="0" p="0" ry="${M_PI/6}" x="${bodyradius/2*gen3}" y="${bodyradius/2}"/>
-<xacro:leg leg="leg2" r="0" p="0" ry="${M_PI/2}" x="0" y="${bodyradius}"/>
-<xacro:leg leg="leg3" r="0" p="0" ry="${M_PI/6*5}" x="-${bodyradius/2*gen3}" y="${bodyradius/2}"/>
-<xacro:leg leg="leg4" r="0" p="0" ry="-${M_PI/6*5}" x="-${bodyradius/2*gen3}" y="-${bodyradius/2}"/>
-<xacro:leg leg="leg5" r="0" p="0" ry="-${M_PI/2}" x="0" y="-${bodyradius}"/>
-<xacro:leg leg="leg6" r="0" p="0" ry="-${M_PI/6}" x="${bodyradius/2*gen3}" y="-${bodyradius/2}"/>
+<xacro:leg leg="leg1" r="0" p="0" ry="${M_PI/6}" x="${(bodyradius-holelength)/2*gen3}" y="${(bodyradius-holelength)/2}"/>
+<xacro:leg leg="leg2" r="0" p="0" ry="${M_PI/2}" x="0" y="${(bodyradius-holelength)}"/>
+<xacro:leg leg="leg3" r="0" p="0" ry="${M_PI/6*5}" x="-${(bodyradius-holelength)/2*gen3}" y="${(bodyradius-holelength)/2}"/>
+<xacro:leg leg="leg4" r="0" p="0" ry="-${M_PI/6*5}" x="-${(bodyradius-holelength)/2*gen3}" y="-${(bodyradius-holelength)/2}"/>
+<xacro:leg leg="leg5" r="0" p="0" ry="-${M_PI/2}" x="0" y="-${(bodyradius-holelength)}"/>
+<xacro:leg leg="leg6" r="0" p="0" ry="-${M_PI/6}" x="${(bodyradius-holelength)/2*gen3}" y="-${(bodyradius-holelength)/2}"/>
 
 
 

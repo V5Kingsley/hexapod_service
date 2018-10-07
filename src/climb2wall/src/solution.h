@@ -45,14 +45,19 @@ private:
   actionlib::SimpleActionClient<hexapodservice::hexapodserviceAction> hexapodClient;
   hexapodservice::hexapodserviceGoal legGoal;
   hexapodservice::hexapodserviceGoal maxpointsGoal;
-  bool bufferFree;   
+  bool bufferFree;
   bool motionActive;
   int freeSpace;
   int sm_point_buf_size;
 
+  vector<float> MeclErr;
+  vector<vector<float>> MeclErrBalnRate;
+  float MeclErrUnit;
+  int stepNUM;
+
 public:
   double COXA_LENGTH, FEMUR_LENGTH, TIBIA_LENGTH, TARSUS_LENGTH;
-  Solution(const std:: string name, bool spin_thread);
+  Solution(const std::string name, bool spin_thread);
   void positionCalculate(const int &leg_index, const hexapod_msgs::LegJoints &leg, geometry_msgs::Point &pos);
   void interpolationOnGround(const geometry_msgs::Point &initPos, const geometry_msgs::Point &finalPos, const double &liftHeight, const double &cycle_period, const int &cycle_length, geometry_msgs::Point &outputPos);
   void jointCalculate(const bool &groundOrWall, const int &leg_index, const geometry_msgs::Point &pos, const double roll_t, hexapod_msgs::LegJoints &leg);
@@ -85,12 +90,17 @@ public:
   double meanCalculate(const int bufferIndex, const int i, const int k);
   void publishSmoothPos(const int leg_index);
   void publishPrePressPos();
+  void meclErrRecover(const int &cycle_length, hexapod_msgs::LegsJoints &legs);
+  void publishMeclErrRecover();
+  bool meclErrRecFeedDrivers();
 
-//六足客户端
+  //六足客户端
   bool feedDrviers(const int leg_index);
   bool prePressFeedDrviers();
   bool legControlHalf();
   bool legControlRest();
+  bool prePressLegControlHalf();
+  bool prePressLegControlRest();
   void legcontrol_doneCb(const actionlib::SimpleClientGoalState &state, const hexapodservice::hexapodserviceResultConstPtr &result);
   void maxpoint_doneCb(const actionlib::SimpleClientGoalState &state, const hexapodservice::hexapodserviceResultConstPtr &result);
   void maxpointsRequest();
@@ -114,7 +124,8 @@ public:
   std::vector<std::string> joint_name;
   sensor_msgs::JointState joint_states;
 
-  
+
+  int stepCnt;
 };
 
 #endif

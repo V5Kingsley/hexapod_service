@@ -24,11 +24,11 @@ TeleopPanel::TeleopPanel( QWidget* parent )
   , linear_velocity_x( 0 )
   , linear_velocity_y( 0 )//当前速度初始化
   , angular_velocity_( 0 )
-  , smcontrol_client("hexapodservice", true)
+  , smcontrol_client("hexapod_sm_service", true)
   , linear_velocity_x_tab3( 0 )
   ,linear_velocity_y_tab3( 0 )
   , angular_velocity_tab3( 0 )
-
+  
   
   
   
@@ -155,7 +155,7 @@ TeleopPanel::TeleopPanel( QWidget* parent )
  stopButton_tab3 = new QPushButton ( tr("Stop") );
     stopButton->setDefault(true);
     stopButton->setEnabled(false);
-      
+    
  motion_control_layout->addWidget(upButton);
  motion_control_layout->addWidget(downButton);
  motion_control_layout->addWidget(leftButton);
@@ -173,7 +173,7 @@ TeleopPanel::TeleopPanel( QWidget* parent )
  leftup_layout_tab3->addWidget(stride_length_);
  
  QLabel *vklogoLabel = new QLabel;
- QPixmap vkIcon("/home/quan/hexapod_service_ws/src/vk_rviz_teleop/images/logo_150.jpeg");
+ QPixmap vkIcon("/home/lincoln/catkin_ws/src/rviz_teleop_commander/images/logo_150.png");
  vklogoLabel->setPixmap(vkIcon);
  vklogoLabel->resize(150,80);
  
@@ -224,15 +224,17 @@ this->setLayout(layout3);
 
 
   // 创建一个定时器，用来定时发布消息
-  QTimer* output_timer = new QTimer( this );
+  //QTimer* output_timer = new QTimer( this );
+  output_timer->start(100);
 
   // 设置信号和槽的连接  信号信号
   connect( output_topic_editor_, SIGNAL( editingFinished() ), this, SLOT( updateTopic() ));             // 输入topic命名，回车后，调用updateTopic()
   connect( output_topic_editor_tab3_, SIGNAL( editingFinished() ), this, SLOT(updateTopic_tab3())); 
-
-  
+ 
   connect( runButton,SIGNAL(clicked(bool)),this,SLOT( update_Linear_Velocity() ) );
   connect( runButton,SIGNAL(clicked(bool)),this,SLOT( update_Angular_Velocity() ) );
+  connect( runButton,SIGNAL(clicked(bool)),this,SLOT(run_sendvel() ) );
+
   connect(stopButton,SIGNAL(clicked(bool)),this,SLOT(stopVelocity()) );
   
   connect(OPENBUSButton,SIGNAL(clicked(bool)),this,SLOT(OPENBUSButtonFuc()));
@@ -253,13 +255,22 @@ this->setLayout(layout3);
   connect(spininvButton_tab3,SIGNAL(clicked(bool)),this,SLOT(spininvFuc()));
   connect(stopButton_tab3,SIGNAL(clicked(bool)),this,SLOT(stopFuc_tab3() ));
   
+  connect(upButton,SIGNAL(clicked(bool)),this,SLOT(run_sendvel_tab3()));
+  connect(downButton,SIGNAL(clicked(bool)),this,SLOT(run_sendvel_tab3()));
+  connect(leftButton,SIGNAL(clicked(bool)),this,SLOT(run_sendvel_tab3()));
+  connect(rightButton,SIGNAL(clicked(bool)),this,SLOT(run_sendvel_tab3()));
+  connect(spinButton_tab3,SIGNAL(clicked(bool)),this,SLOT(run_sendvel_tab3()));
+  connect(spininvButton_tab3,SIGNAL(clicked(bool)),this,SLOT(run_sendvel_tab3()));
+  
+  
+  /*
   // 设置定时器的回调函数，按周期调用sendVel()
   connect( output_timer, SIGNAL( timeout() ), this, SLOT( sendVel() ));
   connect( output_timer, SIGNAL( timeout() ), this, SLOT( sendVel_tab3() ));
-
+  */
 
   // 设置定时器的周期，100ms
-  output_timer->start( 100 );
+  //output_timer->start( 100 );
 }
 
 QListView  *TeleopPanel::listView_in_tab2_ = new QListView;   //类外定义listview 
@@ -271,6 +282,9 @@ void TeleopPanel::stopVelocity()
     linear_velocity_y = 0;
     angular_velocity_ = 0;
     stopButton->setEnabled(false);
+    //velocity_publisher_.shutdown();
+    disconnect( output_timer, SIGNAL( timeout() ), this, SLOT( sendVel() ));
+
 }
 
 void TeleopPanel::stopFuc_tab3()
@@ -289,6 +303,9 @@ void TeleopPanel::stopFuc_tab3()
     
     output_topic_editor_tab3_->setEnabled(true);
     stride_length_->setEnabled(true);
+    
+    disconnect( output_timer, SIGNAL( timeout() ), this, SLOT( sendVel_tab3() ));
+    //chatter_publisher_tab3.shutdown();
     
 }
 
@@ -490,6 +507,24 @@ void TeleopPanel::spininvFuc()
     
     output_topic_editor_tab3_->setEnabled(false);
     stride_length_->setEnabled(false);
+}
+
+void TeleopPanel::run_sendvel()
+{
+  //QTimer* output_timer = new QTimer( this );
+  //output_timer->start(100);
+  connect( output_timer, SIGNAL( timeout() ), this, SLOT( sendVel() ));
+  //connect( output_timer, SIGNAL( timeout() ), this, SLOT( sendVel_tab3() ));
+  
+  
+}
+
+void TeleopPanel::run_sendvel_tab3()
+{
+  //QTimer* output_timer = new QTimer( this );
+  //output_timer->start(100);
+  connect( output_timer, SIGNAL( timeout() ), this, SLOT( sendVel_tab3() ));
+  
 }
 
 

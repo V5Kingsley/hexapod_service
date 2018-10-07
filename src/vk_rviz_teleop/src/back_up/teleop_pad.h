@@ -3,11 +3,12 @@
 //© VK control   
 //Made by Lincoln
 
-//所需要包含的头文件   
+//所需要包含的头文件
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <rviz/panel.h>   //plugin基类的头文件
 #include <QListView>
+#include <QTimer>
 
 //addbylincoln
 /*
@@ -24,7 +25,6 @@
 #include <hexapodservice/hexapodserviceAction.h>
 #include <std_msgs/Int32.h>
 #include "../include/define.h"
-//#include "../include/hexapodserviceResult.h"
 
 
 class QTabWidget;   //tab_window 类需要用到
@@ -65,6 +65,8 @@ public Q_SLOTS:
 protected Q_SLOTS:
   void sendVel();                 // 发布当前的速度值
   void sendVel_tab3();
+  void run_sendvel();
+  void run_sendvel_tab3();
   
   void update_Linear_Velocity();  // 根据用户的输入更新线速度值
   void update_Angular_Velocity(); // 根据用户的输入更新角速度值
@@ -137,6 +139,10 @@ protected:
 
   // The ROS node handle.
   ros::NodeHandle nh_;
+  
+  QTimer* output_timer = new QTimer( this );
+  
+  
 
   //addbylincoln
   actionlib::SimpleActionClient<hexapodservice::hexapodserviceAction> smcontrol_client;

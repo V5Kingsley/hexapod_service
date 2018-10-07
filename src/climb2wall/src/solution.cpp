@@ -19,6 +19,19 @@ Solution::Solution(const std::string name, bool spin_thread) : hexapodClient(nam
   ros::param::get("KPALIMIT", KPALIMIT);
   nh_.param<int>("VkBHexSM/sm_point_buf_size", sm_point_buf_size, 3000);
 
+  //补偿
+  ros::param::get("JOINT_MECHANICAL_ERROR", MeclErr);
+  ros::param::get("JOINT_MECHANICAL_ERROR_UNIT", MeclErrUnit);
+  for (int i = 0; i < 24; i++)
+  {
+    vector<float> oneRate;
+    ros::param::get(("JOINT" + std::to_string(i + 1) + "_MECHANICAL_ERROR_BALANCE_RATE"), oneRate);
+    MeclErrBalnRate.push_back(oneRate);
+  }
+  stepNUM = MeclErrBalnRate[0].size();
+
+  stepCnt = 0;
+
   //发布的关节角度话题
   boost::format coxa;
   boost::format femur;
@@ -672,6 +685,15 @@ void Solution::rightLeg2Wall(const int leg_index, const geometry_msgs::Point &in
 void Solution::prePress(const int leg_index, const double &prePress, const double &roll, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
 {
   hexapod_msgs::LegJoints initLeg; //缓存初始关节角
+
+  for (int i = 0; i < 6; i++)
+  {
+    legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErrBalnRate[i * 4][stepCnt] * MeclErr[i * 4];
+    legs.leg[i].femur = legs.leg[i].femur + MeclErrUnit * MeclErrBalnRate[i * 4 + 1][stepCnt] * MeclErr[i * 4 + 1];
+    legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErrBalnRate[i * 4 + 2][stepCnt] * MeclErr[i * 4 + 2];
+    legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErrBalnRate[i * 4 + 3][stepCnt] * MeclErr[i * 4 + 3];
+  }
+
   initLeg.coxa = legs.leg[leg_index].coxa;
   initLeg.femur = legs.leg[leg_index].femur;
   initLeg.tibia = legs.leg[leg_index].tibia;
@@ -702,106 +724,66 @@ void Solution::prePress(const int leg_index, const double &prePress, const doubl
 
     double beta = (1.0 + sign[leg_index]) / 2.0 * M_PI / 2.0;
 
-    legs.leg[leg_index].coxa = sign[leg_index] * M_PI / 2 - INIT_COXA_ANGLE[leg_index];
-    legs.leg[leg_index].femur = beta - sign[leg_index] * roll - x;
+    //  legs.leg[leg_index].coxa = sign[leg_index] * M_PI / 2 - INIT_COXA_ANGLE[leg_index];
+    legs.leg[leg_index].coxa = initLeg.coxa;
+    legs.leg[leg_index].femur = initLeg.femur + initLeg.tarsus + initLeg.tibia - x;
     legs.leg[leg_index].tibia = x - y;
     legs.leg[leg_index].tarsus = y;
 
-    legSafeControl(legs.leg[leg_index]);
+    // legSafeControl(legs.leg[leg_index]);
 
     publishJointStates(legs);
     // ros::Duration(0.005).sleep();
   }
-  posMeanFilter();
+  //  posMeanFilter();
   publishPrePressPos();
 }
 
 void Solution::leg2SpecialPrePress(const int leg_index, const double &prePress, const double &roll, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
 {
-  {
-    hexapod_msgs::LegJoints initLeg; //缓存初始关节角
-    initLeg.coxa = legs.leg[leg_index].coxa;
-    initLeg.femur = legs.leg[leg_index].femur;
-    initLeg.tibia = legs.leg[leg_index].tibia;
-    initLeg.tarsus = legs.leg[leg_index].tarsus;
-    bool flag = true;
 
-    for (int cycle_period = 0; cycle_period <= cycle_length; cycle_period++)
-    {
-      double interFuncX;
-      double foot2foot_x;
-
-      if (cycle_period <= 0.5 * cycle_length)
-      {
-        interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) + 0.5;
-        foot2foot_x = (prePress + 0.02) * interFuncX;
-      }
-      else
-      {
-        if (flag)
-        {
-          initLeg.coxa = legs.leg[leg_index].coxa;
-          initLeg.femur = legs.leg[leg_index].femur;
-          initLeg.tibia = legs.leg[leg_index].tibia;
-          initLeg.tarsus = legs.leg[leg_index].tarsus;
-          flag = false;
-        }
-        interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) - 0.5;
-        foot2foot_x = prePress * interFuncX;
-      }
-
-      double foot2foot_y = 0;
-
-      double A = FEMUR_LENGTH * sin(initLeg.tibia + initLeg.tarsus) + TIBIA_LENGTH * cos(initLeg.tarsus) + foot2foot_x;
-      double B = FEMUR_LENGTH * cos(initLeg.tibia + initLeg.tarsus) - TIBIA_LENGTH * sin(initLeg.tarsus) + foot2foot_y;
-      double C = FEMUR_LENGTH;
-      double D = TIBIA_LENGTH;
-
-      double temp = 4.0 * pow(C, 2) * pow(D, 2) - pow((A * A + B * B - C * C - D * D), 2);
-      temp = temp > 0 ? temp : 0;
-
-      double x = 2.0 * atan(
-                           (2.0 * A * C - sqrt(temp)) /
-                           (A * A + pow((B + C), 2) - D * D));
-
-      double y = 2.0 * atan(
-                           (-2.0 * B * D + sqrt(temp)) /
-                           (pow((A + D), 2) + B * B - C * C));
-
-      double beta = (1.0 + sign[leg_index]) / 2.0 * M_PI / 2.0;
-
-      legs.leg[leg_index].coxa = sign[leg_index] * M_PI / 2 - INIT_COXA_ANGLE[leg_index];
-      legs.leg[leg_index].femur = beta - sign[leg_index] * roll - x;
-      legs.leg[leg_index].tibia = x - y;
-      legs.leg[leg_index].tarsus = y;
-
-      legSafeControl(legs.leg[leg_index]);
-
-      publishJointStates(legs);
-      // ros::Duration(0.005).sleep();
-    }
-    posMeanFilter();
-    publishPrePressPos();
-  }
-}
-
-/************************************
-*           %蜘蛛圆周步态预压函数(无俯仰时)%        *
-*
-*
-**************************************/
-void Solution::cyclePosPrePress(const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
-{
   hexapod_msgs::LegJoints initLeg; //缓存初始关节角
+
+  for (int i = 0; i < 6; i++)
+  {
+    legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErrBalnRate[i * 4][stepCnt] * MeclErr[i * 4];
+    legs.leg[i].femur = legs.leg[i].femur + MeclErrUnit * MeclErrBalnRate[i * 4 + 1][stepCnt] * MeclErr[i * 4 + 1];
+    legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErrBalnRate[i * 4 + 2][stepCnt] * MeclErr[i * 4 + 2];
+    legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErrBalnRate[i * 4 + 3][stepCnt] * MeclErr[i * 4 + 3];
+  }
+
   initLeg.coxa = legs.leg[leg_index].coxa;
   initLeg.femur = legs.leg[leg_index].femur;
   initLeg.tibia = legs.leg[leg_index].tibia;
   initLeg.tarsus = legs.leg[leg_index].tarsus;
 
+  double stickAngle = initLeg.femur + initLeg.tarsus + initLeg.tibia;
+
+  bool flag = true;
+
   for (int cycle_period = 0; cycle_period <= cycle_length; cycle_period++)
   {
-    double interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) + 0.5;
-    double foot2foot_x = prePress * interFuncX;
+    double interFuncX;
+    double foot2foot_x;
+
+    if (cycle_period <= 0.5 * cycle_length)
+    {
+      interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) + 0.5;
+      foot2foot_x = (prePress + 0.02) * interFuncX;
+    }
+    else
+    {
+      if (flag)
+      {
+        initLeg.coxa = legs.leg[leg_index].coxa;
+        initLeg.femur = legs.leg[leg_index].femur;
+        initLeg.tibia = legs.leg[leg_index].tibia;
+        initLeg.tarsus = legs.leg[leg_index].tarsus;
+        flag = false;
+      }
+      interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) - 0.5;
+      foot2foot_x = prePress * interFuncX;
+    }
 
     double foot2foot_y = 0;
 
@@ -821,17 +803,77 @@ void Solution::cyclePosPrePress(const int leg_index, const double &prePress, con
                          (-2.0 * B * D + sqrt(temp)) /
                          (pow((A + D), 2) + B * B - C * C));
 
-    legs.leg[leg_index].coxa = initLeg.coxa;
-    legs.leg[leg_index].femur = -x;
+    double beta = (1.0 + sign[leg_index]) / 2.0 * M_PI / 2.0;
+
+    legs.leg[leg_index].coxa = sign[leg_index] * M_PI / 2 - INIT_COXA_ANGLE[leg_index];
+    legs.leg[leg_index].femur = stickAngle - sign[leg_index] * roll - x;
     legs.leg[leg_index].tibia = x - y;
     legs.leg[leg_index].tarsus = y;
 
-    legSafeControl(legs.leg[leg_index]);
+    //  legSafeControl(legs.leg[leg_index]);
 
     publishJointStates(legs);
     // ros::Duration(0.005).sleep();
   }
-  posMeanFilter();
+  //  posMeanFilter();
+  publishPrePressPos();
+}
+
+/************************************
+*           %蜘蛛圆周步态预压函数(无俯仰时)%        *
+*
+*
+**************************************/
+void Solution::cyclePosPrePress(const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
+{
+  hexapod_msgs::LegJoints initLeg; //缓存初始关节角
+
+  for (int i = 0; i < 6; i++)
+  {
+    legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErrBalnRate[i * 4][stepCnt] * MeclErr[i * 4];
+    legs.leg[i].femur = legs.leg[i].femur + MeclErrUnit * MeclErrBalnRate[i * 4 + 1][stepCnt] * MeclErr[i * 4 + 1];
+    legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErrBalnRate[i * 4 + 2][stepCnt] * MeclErr[i * 4 + 2];
+    legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErrBalnRate[i * 4 + 3][stepCnt] * MeclErr[i * 4 + 3];
+  }
+
+  initLeg.coxa = legs.leg[leg_index].coxa;
+  initLeg.femur = legs.leg[leg_index].femur;
+  initLeg.tibia = legs.leg[leg_index].tibia;
+  initLeg.tarsus = legs.leg[leg_index].tarsus;
+
+  for (int cycle_period = 0; cycle_period <= cycle_length; cycle_period++)
+  {
+    double interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) + 0.5;
+    double foot2foot_x = prePress * interFuncX;
+    double foot2foot_y = 0;
+
+    double A = FEMUR_LENGTH * sin(initLeg.tibia + initLeg.tarsus) + TIBIA_LENGTH * cos(initLeg.tarsus) + foot2foot_x;
+    double B = FEMUR_LENGTH * cos(initLeg.tibia + initLeg.tarsus) - TIBIA_LENGTH * sin(initLeg.tarsus) + foot2foot_y;
+    double C = FEMUR_LENGTH;
+    double D = TIBIA_LENGTH;
+
+    double temp = 4.0 * pow(C, 2) * pow(D, 2) - pow((A * A + B * B - C * C - D * D), 2);
+    temp = temp > 0 ? temp : 0;
+
+    double x = 2.0 * atan(
+                         (2.0 * A * C - sqrt(temp)) /
+                         (A * A + pow((B + C), 2) - D * D));
+
+    double y = 2.0 * atan(
+                         (-2.0 * B * D + sqrt(temp)) /
+                         (pow((A + D), 2) + B * B - C * C));
+
+    legs.leg[leg_index].coxa = initLeg.coxa;
+    legs.leg[leg_index].femur = initLeg.femur + initLeg.tarsus + initLeg.tibia - x;
+    legs.leg[leg_index].tibia = x - y;
+    legs.leg[leg_index].tarsus = y;
+
+    // legSafeControl(legs.leg[leg_index]);
+
+    publishJointStates(legs);
+    // ros::Duration(0.005).sleep();
+  }
+  //  posMeanFilter();
   publishPrePressPos();
 }
 
@@ -848,7 +890,7 @@ void Solution::posMeanFilter()
   {
     for (int bufferIndex = 0; bufferIndex < 24; bufferIndex++)
     {
-      smoothPosBuffer[bufferIndex].push_back(posBuffer[bufferIndex][i]);
+      smoothPosBuffer[bufferIndex].push_back(posBuffer[bufferIndex][i] + (double)i / posBuffer[0].size() * MeclErrBalnRate[bufferIndex][stepCnt] * MeclErr[bufferIndex] * MeclErrUnit);
     }
   }
 
@@ -857,7 +899,7 @@ void Solution::posMeanFilter()
   {
     for (int bufferIndex = 0; bufferIndex < 24; bufferIndex++)
     {
-      smoothPosBuffer[bufferIndex].push_back(meanCalculate(bufferIndex, i, k));
+      smoothPosBuffer[bufferIndex].push_back(meanCalculate(bufferIndex, i, k) + (double)i / posBuffer[0].size() * MeclErrBalnRate[bufferIndex][stepCnt] * MeclErr[bufferIndex] * MeclErrUnit);
     }
   }
 
@@ -866,7 +908,7 @@ void Solution::posMeanFilter()
   {
     for (int bufferIndex = 0; bufferIndex < 24; bufferIndex++)
     {
-      smoothPosBuffer[bufferIndex].push_back(posBuffer[bufferIndex][i]);
+      smoothPosBuffer[bufferIndex].push_back(posBuffer[bufferIndex][i] + (double)i / posBuffer[0].size() * MeclErrBalnRate[bufferIndex][stepCnt] * MeclErr[bufferIndex] * MeclErrUnit);
     }
   }
 
@@ -918,14 +960,14 @@ void Solution::publishSmoothPos(const int leg_index)
 
 void Solution::publishPrePressPos()
 {
-  /*for (int i = 0; i < smoothPosBuffer[0].size(); i++)
+  /*  for (int i = 0; i < posBuffer[0].size(); i++)
   {
     for (int leg = 0; leg < 6; leg++)
     {
-      leg_coxa[leg].data = smoothPosBuffer[leg * 4][i];
-      leg_femur[leg].data = smoothPosBuffer[leg * 4 + 1][i];
-      leg_tibia[leg].data = smoothPosBuffer[leg * 4 + 2][i];
-      leg_tarsus[leg].data = smoothPosBuffer[leg * 4 + 3][i];
+      leg_coxa[leg].data = posBuffer[leg * 4][i];
+      leg_femur[leg].data = posBuffer[leg * 4 + 1][i];
+      leg_tibia[leg].data = posBuffer[leg * 4 + 2][i];
+      leg_tarsus[leg].data = posBuffer[leg * 4 + 3][i];
     }
 
     for (int leg = 0; leg < 6; leg++)
@@ -938,10 +980,15 @@ void Solution::publishPrePressPos()
 
     ros::Duration(0.005).sleep();
   }*/
-  ROS_INFO("size: %d", smoothPosBuffer[0].size());
+  ROS_INFO("size: %d", posBuffer[0].size());
 
   if (prePressFeedDrviers() != true)
     ros::shutdown();
+
+  for (int i = 0; i < 24; i++)
+  {
+    posBuffer[i].clear(); //清空缓存
+  }
 }
 
 bool Solution::feedDrviers(const int leg_index)
@@ -1025,16 +1072,8 @@ bool Solution::prePressFeedDrviers()
   }
   ROS_INFO("%s, request io: %d, %d, %d, %d, %d, %d", stickSrv.response.back.c_str(), requestIO[0], requestIO[1], requestIO[2], requestIO[3], requestIO[4], requestIO[5]);
 
-  if (legControlHalf() != true) //发送前半个周期给服务器
+  if (prePressLegControlHalf() != true) //发送前半个周期给服务器
     return false;
-
-  maxpointsRequest();
-
-  while (!bufferFree)
-  {
-    ros::Duration(2).sleep();
-    maxpointsRequest();
-  }
 
   if (!motionActive)
   {
@@ -1051,7 +1090,7 @@ bool Solution::prePressFeedDrviers()
   }
   ROS_INFO("Prepress finished. ");
 
-  if (legControlRest() != true) //发送后半个周期给服务器
+  if (prePressLegControlRest() != true) //发送后半个周期给服务器
     return false;
 
   return true;
@@ -1219,13 +1258,111 @@ bool Solution::legControlRest()
   return true;
 }
 
+bool Solution::prePressLegControlHalf()
+{
+  legGoal.MODE = ALLLEGS_CONTROL;
+  legGoal.MAXPOINTS = 0.5 * posBuffer[0].size();
+  ROS_INFO("half maxpoints: %d", legGoal.MAXPOINTS);
+
+  for (int i = 0; i < 6; i++)
+  {
+    legGoal.ALLLEGS.leg[i].coxa.resize(legGoal.MAXPOINTS);
+    legGoal.ALLLEGS.leg[i].femur.resize(legGoal.MAXPOINTS);
+    legGoal.ALLLEGS.leg[i].tibia.resize(legGoal.MAXPOINTS);
+    legGoal.ALLLEGS.leg[i].tarsus.resize(legGoal.MAXPOINTS);
+  }
+
+  for (int i = 0; i < legGoal.MAXPOINTS; i++)
+  {
+    for (int leg_index = 0; leg_index < 6; leg_index++)
+    {
+      legGoal.ALLLEGS.leg[leg_index].coxa[i] = round(4096.0 * (3005640.0 / 1300.0) * (posBuffer[leg_index * 4][i] / M_PI * 180.0) / 360.0);
+      legGoal.ALLLEGS.leg[leg_index].femur[i] = round(4096.0 * (3005640.0 / 1300.0) * (-posBuffer[leg_index * 4 + 1][i] / M_PI * 180.0) / 360.0);
+      legGoal.ALLLEGS.leg[leg_index].tibia[i] = round(4096.0 * (3005640.0 / 1300.0) * (-posBuffer[leg_index * 4 + 2][i] / M_PI * 180.0) / 360.0);
+      legGoal.ALLLEGS.leg[leg_index].tarsus[i] = round(4096.0 * (3005640.0 / 1300.0) * (-posBuffer[leg_index * 4 + 3][i] / M_PI * 180.0) / 360.0);
+    }
+  }
+
+  bool server_exists = hexapodClient.waitForServer(ros::Duration(5.0));
+  while (!server_exists)
+  {
+    ROS_WARN("could not connect to server, retrying...");
+    server_exists = hexapodClient.waitForServer(ros::Duration(5.0));
+  }
+
+  hexapodClient.sendGoal(legGoal, boost::bind(&Solution::legcontrol_doneCb, this, _1, _2));
+
+  bool finished = hexapodClient.waitForResult(ros::Duration(5.0));
+  if (!finished)
+  {
+    ROS_WARN("Waiting for result...");
+    finished = hexapodClient.waitForResult(ros::Duration(5.0));
+    if (!finished)
+    {
+      ROS_FATAL("Connecting failed.");
+      ros::shutdown();
+      return false;
+    }
+  }
+  return true;
+}
+
+bool Solution::prePressLegControlRest()
+{
+  legGoal.MODE = ALLLEGS_CONTROL;
+  legGoal.MAXPOINTS = posBuffer[0].size() - (int)(posBuffer[0].size() * 0.5);
+  ROS_INFO("rest maxpoints: %d", legGoal.MAXPOINTS);
+
+  for (int i = 0; i < 6; i++)
+  {
+    legGoal.ALLLEGS.leg[i].coxa.resize(legGoal.MAXPOINTS);
+    legGoal.ALLLEGS.leg[i].femur.resize(legGoal.MAXPOINTS);
+    legGoal.ALLLEGS.leg[i].tibia.resize(legGoal.MAXPOINTS);
+    legGoal.ALLLEGS.leg[i].tarsus.resize(legGoal.MAXPOINTS);
+  }
+
+  for (int cnt = 0.5 * posBuffer[0].size(), i = 0; cnt < posBuffer[0].size(); cnt++, i++)
+  {
+    for (int leg_index = 0; leg_index < 6; leg_index++)
+    {
+      legGoal.ALLLEGS.leg[leg_index].coxa[i] = round(4096.0 * (3005640.0 / 1300.0) * (posBuffer[leg_index * 4][cnt] / M_PI * 180.0) / 360.0);
+      legGoal.ALLLEGS.leg[leg_index].femur[i] = round(4096.0 * (3005640.0 / 1300.0) * (-posBuffer[leg_index * 4 + 1][cnt] / M_PI * 180.0) / 360.0);
+      legGoal.ALLLEGS.leg[leg_index].tibia[i] = round(4096.0 * (3005640.0 / 1300.0) * (-posBuffer[leg_index * 4 + 2][cnt] / M_PI * 180.0) / 360.0);
+      legGoal.ALLLEGS.leg[leg_index].tarsus[i] = round(4096.0 * (3005640.0 / 1300.0) * (-posBuffer[leg_index * 4 + 3][cnt] / M_PI * 180.0) / 360.0);
+    }
+  }
+
+  bool server_exists = hexapodClient.waitForServer(ros::Duration(5.0));
+  while (!server_exists)
+  {
+    ROS_WARN("could not connect to server, retrying...");
+    server_exists = hexapodClient.waitForServer(ros::Duration(5.0));
+  }
+
+  hexapodClient.sendGoal(legGoal, boost::bind(&Solution::legcontrol_doneCb, this, _1, _2));
+
+  bool finished = hexapodClient.waitForResult(ros::Duration(5.0));
+  if (!finished)
+  {
+    ROS_WARN("Waiting for result...");
+    finished = hexapodClient.waitForResult(ros::Duration(5.0));
+    if (!finished)
+    {
+      ROS_FATAL("Connecting failed.");
+      ros::shutdown();
+      return false;
+    }
+  }
+  return true;
+}
+
 //发布角度反馈给rviz同步显示
 void Solution::sm_pos_Cb(const hexapodservice::legConstPtr &leg)
 {
   joint_states.header.stamp = ros::Time::now();
   int i = 0;
-  joint_states.name.resize(36);
-  joint_states.position.resize(36);
+  joint_states.name.resize(30);
+  joint_states.position.resize(30);
   for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     joint_states.name[i] = joint_name[i];
@@ -1239,10 +1376,6 @@ void Solution::sm_pos_Cb(const hexapodservice::legConstPtr &leg)
     i++;
     joint_states.name[i] = joint_name[i];
     joint_states.position[i] = -leg->leg[leg_index].tarsus;
-    i++;
-    //吸盘
-    joint_states.name[i] = joint_name[i];
-    joint_states.position[i] = 0;
     i++;
     //吸盘
     joint_states.name[i] = joint_name[i];
@@ -1338,4 +1471,90 @@ void Solution::stickControl(const int leg_index)
     ros::Duration(5).sleep(); //吸盘放气等待时间
 
   ROS_INFO("Hexapod is ready to move.");
+}
+
+void Solution::meclErrRecover(const int &cycle_length, hexapod_msgs::LegsJoints &legs)
+{
+  hexapod_msgs::LegsJoints initlegs;
+  for (int leg_index = 0; leg_index < 6; leg_index++)
+  {
+    initlegs.leg[leg_index].coxa = legs.leg[leg_index].coxa;
+    initlegs.leg[leg_index].femur = legs.leg[leg_index].femur;
+    initlegs.leg[leg_index].tibia = legs.leg[leg_index].tibia;
+    initlegs.leg[leg_index].tarsus = legs.leg[leg_index].tarsus;
+  }
+
+  for (int i = 0; i <= cycle_length; i++)
+  {
+    for (int leg_index = 0; leg_index < 6; leg_index++)
+    {
+      legs.leg[leg_index].coxa = 0.5 * MeclErrUnit * MeclErr[leg_index * 4] * MeclErrBalnRate[leg_index * 4][stepCnt] * cos(M_PI * i / cycle_length) + initlegs.leg[leg_index].coxa - 0.5 * MeclErrUnit * MeclErr[leg_index * 4] * MeclErrBalnRate[leg_index * 4][stepCnt];
+
+      legs.leg[leg_index].femur = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 1] * MeclErrBalnRate[leg_index * 4 + 1][stepCnt] * cos(M_PI * i / cycle_length) + initlegs.leg[leg_index].femur - 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 1] * MeclErrBalnRate[leg_index * 4 + 1][stepCnt];
+
+      legs.leg[leg_index].tibia = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 2] * MeclErrBalnRate[leg_index * 4 + 2][stepCnt] * cos(M_PI * i / cycle_length) + initlegs.leg[leg_index].tibia - 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 2] * MeclErrBalnRate[leg_index * 4 + 2][stepCnt];
+
+      legs.leg[leg_index].tarsus = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * MeclErrBalnRate[leg_index * 4 + 3][stepCnt] * cos(M_PI * i / cycle_length) + initlegs.leg[leg_index].tarsus - 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * MeclErrBalnRate[leg_index * 4 + 3][stepCnt];
+    }
+    publishJointStates(legs);
+  }
+  publishMeclErrRecover();
+}
+
+void Solution::publishMeclErrRecover()
+{
+  /* for (int i = 0; i < posBuffer[0].size(); i++)
+  {
+    for (int leg = 0; leg < 6; leg++)
+    {
+      leg_coxa[leg].data = posBuffer[leg * 4][i];
+      leg_femur[leg].data = posBuffer[leg * 4 + 1][i];
+      leg_tibia[leg].data = posBuffer[leg * 4 + 2][i];
+      leg_tarsus[leg].data = posBuffer[leg * 4 + 3][i];
+    }
+
+    for (int leg = 0; leg < 6; leg++)
+    {
+      leg_coxa_p[leg].publish(leg_coxa[leg]);
+      leg_femur_p[leg].publish(leg_femur[leg]);
+      leg_tibia_p[leg].publish(leg_tibia[leg]);
+      leg_tarsus_p[leg].publish(leg_tarsus[leg]);
+    }
+
+    ros::Duration(0.005).sleep();
+  }*/
+  ROS_INFO("size: %d", posBuffer[0].size());
+
+  meclErrRecFeedDrivers();
+
+  for (int i = 0; i < 24; i++)
+  {
+    posBuffer[i].clear(); //清空缓存
+  }
+}
+
+bool Solution::meclErrRecFeedDrivers()
+{
+  maxpointsRequest();
+
+  while (freeSpace < (sm_point_buf_size - 30))
+  {
+    ros::Duration(3).sleep();
+    maxpointsRequest();
+  }
+
+  if (!motionActive)
+  {
+    ROS_FATAL("Motion not active!");
+    ros::shutdown();
+    return false;
+  }
+
+  if (prePressLegControlHalf() != true) //发送前半个周期给服务器
+    return false;
+
+  if (prePressLegControlRest() != true) //发送后半个周期给服务器
+    return false;
+
+  return true;
 }

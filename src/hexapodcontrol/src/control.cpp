@@ -411,8 +411,8 @@ void Control::sm_pos_Cb(const hexapodservice::legConstPtr &leg)
 {
   joint_states.header.stamp = ros::Time::now();
   int i = 0;
-  joint_states.name.resize(36);
-  joint_states.position.resize(36);
+  joint_states.name.resize(30);
+  joint_states.position.resize(30);
   for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     joint_states.name[i] = joint_name[i];
@@ -426,10 +426,6 @@ void Control::sm_pos_Cb(const hexapodservice::legConstPtr &leg)
     i++;
     joint_states.name[i] = joint_name[i];
     joint_states.position[i] = -leg->leg[leg_index].tarsus;
-    i++;
-    //吸盘
-    joint_states.name[i] = joint_name[i];
-    joint_states.position[i] = 0;
     i++;
     //吸盘
     joint_states.name[i] = joint_name[i];

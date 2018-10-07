@@ -24,7 +24,7 @@ TeleopPanel::TeleopPanel( QWidget* parent )
   , linear_velocity_x( 0 )
   , linear_velocity_y( 0 )//当前速度初始化
   , angular_velocity_( 0 )
-  , smcontrol_client("hexapodservice", true)
+  , smcontrol_client("hexapod_sm_service", true)
   , linear_velocity_x_tab3( 0 )
   ,linear_velocity_y_tab3( 0 )
   , angular_velocity_tab3( 0 )

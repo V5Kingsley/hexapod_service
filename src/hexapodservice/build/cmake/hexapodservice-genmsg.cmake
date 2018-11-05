@@ -17,7 +17,7 @@ add_custom_target(hexapodservice_generate_messages ALL)
 
 get_filename_component(_filename "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceActionResult.msg" NAME_WE)
 add_custom_target(_hexapodservice_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "hexapodservice" "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceActionResult.msg" "actionlib_msgs/GoalID:actionlib_msgs/GoalStatus:hexapodservice/legjoint:hexapodservice/hexapodserviceResult:std_msgs/Header:hexapodservice/leg"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "hexapodservice" "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceActionResult.msg" "actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:std_msgs/Header:hexapodservice/hexapodserviceResult"
 )
 
 get_filename_component(_filename "/home/quan/hexapod_service_ws/src/hexapodservice/msg/legs.msg" NAME_WE)
@@ -62,12 +62,12 @@ add_custom_target(_hexapodservice_generate_messages_check_deps_${_filename}
 
 get_filename_component(_filename "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg" NAME_WE)
 add_custom_target(_hexapodservice_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "hexapodservice" "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg" "hexapodservice/legjoint:hexapodservice/leg"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "hexapodservice" "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg" ""
 )
 
 get_filename_component(_filename "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceFeedback.msg" NAME_WE)
 add_custom_target(_hexapodservice_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "hexapodservice" "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceFeedback.msg" "hexapodservice/legjoint:hexapodservice/leg"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "hexapodservice" "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceFeedback.msg" "hexapodservice/leg:hexapodservice/legjoint"
 )
 
 #
@@ -79,7 +79,7 @@ add_custom_target(_hexapodservice_generate_messages_check_deps_${_filename}
 _generate_msg_cpp(hexapodservice
   "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg;/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg;/opt/ros/indigo/share/std_msgs/cmake/../msg/Header.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg"
+  "/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/indigo/share/std_msgs/cmake/../msg/Header.msg;/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/hexapodservice
 )
 _generate_msg_cpp(hexapodservice
@@ -133,13 +133,13 @@ _generate_msg_cpp(hexapodservice
 _generate_msg_cpp(hexapodservice
   "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg"
+  ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/hexapodservice
 )
 _generate_msg_cpp(hexapodservice
   "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg"
+  "/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/hexapodservice
 )
 
@@ -192,7 +192,7 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS hexapodservice_generate_messages_cp
 _generate_msg_lisp(hexapodservice
   "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg;/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg;/opt/ros/indigo/share/std_msgs/cmake/../msg/Header.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg"
+  "/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/indigo/share/std_msgs/cmake/../msg/Header.msg;/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/hexapodservice
 )
 _generate_msg_lisp(hexapodservice
@@ -246,13 +246,13 @@ _generate_msg_lisp(hexapodservice
 _generate_msg_lisp(hexapodservice
   "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg"
+  ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/hexapodservice
 )
 _generate_msg_lisp(hexapodservice
   "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg"
+  "/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/hexapodservice
 )
 
@@ -305,7 +305,7 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS hexapodservice_generate_messages_li
 _generate_msg_py(hexapodservice
   "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg;/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg;/opt/ros/indigo/share/std_msgs/cmake/../msg/Header.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg"
+  "/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/indigo/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/indigo/share/std_msgs/cmake/../msg/Header.msg;/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/hexapodservice
 )
 _generate_msg_py(hexapodservice
@@ -359,13 +359,13 @@ _generate_msg_py(hexapodservice
 _generate_msg_py(hexapodservice
   "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg"
+  ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/hexapodservice
 )
 _generate_msg_py(hexapodservice
   "/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg"
+  "/home/quan/hexapod_service_ws/src/hexapodservice/msg/leg.msg;/home/quan/hexapod_service_ws/src/hexapodservice/msg/legjoint.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/hexapodservice
 )
 

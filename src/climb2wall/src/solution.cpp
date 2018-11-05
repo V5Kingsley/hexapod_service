@@ -932,7 +932,8 @@ double Solution::meanCalculate(const int bufferIndex, const int i, const int k)
 
 void Solution::publishSmoothPos(const int leg_index)
 {
-  /* for (int i = 0; i < smoothPosBuffer[0].size(); i++)
+#if !MACHINE
+  for (int i = 0; i < smoothPosBuffer[0].size(); i++)
   {
     for (int leg = 0; leg < 6; leg++)
     {
@@ -951,16 +952,21 @@ void Solution::publishSmoothPos(const int leg_index)
     }
 
     ros::Duration(0.005).sleep();
-  }*/
+  }
+#endif
+
   ROS_INFO("size: %d", smoothPosBuffer[0].size());
 
+#if MACHINE
   if (feedDrviers(leg_index) != true)
     ros::shutdown();
+#endif
 }
 
 void Solution::publishPrePressPos()
 {
-  /*  for (int i = 0; i < posBuffer[0].size(); i++)
+#if !MACHINE
+  for (int i = 0; i < posBuffer[0].size(); i++)
   {
     for (int leg = 0; leg < 6; leg++)
     {
@@ -979,11 +985,15 @@ void Solution::publishPrePressPos()
     }
 
     ros::Duration(0.005).sleep();
-  }*/
+  }
+#endif
+
   ROS_INFO("size: %d", posBuffer[0].size());
 
+#if MACHINE
   if (prePressFeedDrviers() != true)
     ros::shutdown();
+#endif
 
   for (int i = 0; i < 24; i++)
   {
@@ -1503,7 +1513,8 @@ void Solution::meclErrRecover(const int &cycle_length, hexapod_msgs::LegsJoints 
 
 void Solution::publishMeclErrRecover()
 {
-  /* for (int i = 0; i < posBuffer[0].size(); i++)
+#if !MACHINE
+  for (int i = 0; i < posBuffer[0].size(); i++)
   {
     for (int leg = 0; leg < 6; leg++)
     {
@@ -1522,10 +1533,13 @@ void Solution::publishMeclErrRecover()
     }
 
     ros::Duration(0.005).sleep();
-  }*/
+  }
+#endif
   ROS_INFO("size: %d", posBuffer[0].size());
 
+#if MACHINE
   meclErrRecFeedDrivers();
+#endif
 
   for (int i = 0; i < 24; i++)
   {
@@ -1557,4 +1571,26 @@ bool Solution::meclErrRecFeedDrivers()
     return false;
 
   return true;
+}
+
+void Solution::keepMeclErr(hexapod_msgs::LegsJoints &legs)
+{
+  for(int leg_index = 0; leg_index < 6;leg_index++)
+  {
+    legs.leg[leg_index].coxa += MeclErrBalnRate[leg_index*4][stepCnt] * MeclErr[leg_index*4] * MeclErrUnit;
+    legs.leg[leg_index].femur += MeclErrBalnRate[leg_index*4+1][stepCnt] * MeclErr[leg_index*4+1] * MeclErrUnit;
+    legs.leg[leg_index].tibia += MeclErrBalnRate[leg_index*4+2][stepCnt] * MeclErr[leg_index*4+2] * MeclErrUnit;
+    legs.leg[leg_index].tarsus += MeclErrBalnRate[leg_index*4+3][stepCnt] * MeclErr[leg_index*4+3] * MeclErrUnit;
+  }
+}
+
+void Solution::resetMeclErr(hexapod_msgs::LegsJoints &legs)
+{
+  for(int leg_index = 0; leg_index < 6;leg_index++)
+  {
+    legs.leg[leg_index].coxa -= MeclErrBalnRate[leg_index*4][stepCnt] * MeclErr[leg_index*4] * MeclErrUnit;
+    legs.leg[leg_index].femur -= MeclErrBalnRate[leg_index*4+1][stepCnt] * MeclErr[leg_index*4+1] * MeclErrUnit;
+    legs.leg[leg_index].tibia -= MeclErrBalnRate[leg_index*4+2][stepCnt] * MeclErr[leg_index*4+2] * MeclErrUnit;
+    legs.leg[leg_index].tarsus -= MeclErrBalnRate[leg_index*4+3][stepCnt] * MeclErr[leg_index*4+3] * MeclErrUnit;
+  }
 }

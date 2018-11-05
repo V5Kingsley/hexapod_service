@@ -68,12 +68,10 @@ CMakeFiles/hexapodservice_generate_messages_cpp: devel/include/hexapodservice/he
 
 devel/include/hexapodservice/hexapodserviceActionResult.h: /opt/ros/indigo/lib/gencpp/gen_cpp.py
 devel/include/hexapodservice/hexapodserviceActionResult.h: devel/share/hexapodservice/msg/hexapodserviceActionResult.msg
-devel/include/hexapodservice/hexapodserviceActionResult.h: /opt/ros/indigo/share/actionlib_msgs/msg/GoalID.msg
 devel/include/hexapodservice/hexapodserviceActionResult.h: /opt/ros/indigo/share/actionlib_msgs/msg/GoalStatus.msg
-devel/include/hexapodservice/hexapodserviceActionResult.h: ../msg/legjoint.msg
-devel/include/hexapodservice/hexapodserviceActionResult.h: devel/share/hexapodservice/msg/hexapodserviceResult.msg
+devel/include/hexapodservice/hexapodserviceActionResult.h: /opt/ros/indigo/share/actionlib_msgs/msg/GoalID.msg
 devel/include/hexapodservice/hexapodserviceActionResult.h: /opt/ros/indigo/share/std_msgs/msg/Header.msg
-devel/include/hexapodservice/hexapodserviceActionResult.h: ../msg/leg.msg
+devel/include/hexapodservice/hexapodserviceActionResult.h: devel/share/hexapodservice/msg/hexapodserviceResult.msg
 devel/include/hexapodservice/hexapodserviceActionResult.h: /opt/ros/indigo/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/quan/hexapod_service_ws/src/hexapodservice/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C++ code from hexapodservice/hexapodserviceActionResult.msg"
 	catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceActionResult.msg -Ihexapodservice:/home/quan/hexapod_service_ws/src/hexapodservice/msg -Ihexapodservice:/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/indigo/share/actionlib_msgs/cmake/../msg -p hexapodservice -o /home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include/hexapodservice -e /opt/ros/indigo/share/gencpp/cmake/..
@@ -156,16 +154,14 @@ devel/include/hexapodservice/hexapodserviceGoal.h: /opt/ros/indigo/share/gencpp/
 
 devel/include/hexapodservice/hexapodserviceResult.h: /opt/ros/indigo/lib/gencpp/gen_cpp.py
 devel/include/hexapodservice/hexapodserviceResult.h: devel/share/hexapodservice/msg/hexapodserviceResult.msg
-devel/include/hexapodservice/hexapodserviceResult.h: ../msg/legjoint.msg
-devel/include/hexapodservice/hexapodserviceResult.h: ../msg/leg.msg
 devel/include/hexapodservice/hexapodserviceResult.h: /opt/ros/indigo/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/quan/hexapod_service_ws/src/hexapodservice/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Generating C++ code from hexapodservice/hexapodserviceResult.msg"
 	catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg -Ihexapodservice:/home/quan/hexapod_service_ws/src/hexapodservice/msg -Ihexapodservice:/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/indigo/share/actionlib_msgs/cmake/../msg -p hexapodservice -o /home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include/hexapodservice -e /opt/ros/indigo/share/gencpp/cmake/..
 
 devel/include/hexapodservice/hexapodserviceFeedback.h: /opt/ros/indigo/lib/gencpp/gen_cpp.py
 devel/include/hexapodservice/hexapodserviceFeedback.h: devel/share/hexapodservice/msg/hexapodserviceFeedback.msg
-devel/include/hexapodservice/hexapodserviceFeedback.h: ../msg/legjoint.msg
 devel/include/hexapodservice/hexapodserviceFeedback.h: ../msg/leg.msg
+devel/include/hexapodservice/hexapodserviceFeedback.h: ../msg/legjoint.msg
 devel/include/hexapodservice/hexapodserviceFeedback.h: /opt/ros/indigo/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/quan/hexapod_service_ws/src/hexapodservice/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Generating C++ code from hexapodservice/hexapodserviceFeedback.msg"
 	catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceFeedback.msg -Ihexapodservice:/home/quan/hexapod_service_ws/src/hexapodservice/msg -Ihexapodservice:/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/indigo/share/actionlib_msgs/cmake/../msg -p hexapodservice -o /home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include/hexapodservice -e /opt/ros/indigo/share/gencpp/cmake/..

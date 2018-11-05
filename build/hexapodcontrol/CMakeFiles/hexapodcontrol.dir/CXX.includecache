@@ -346,6 +346,16 @@ hexapod_msgs/LegsJoints.h
 hexapod_msgs/FeetPositions.h
 -
 
+/home/quan/hexapod_service_ws/src/hexapodcontrol/src/my_hexapod_controller.cpp
+ros/ros.h
+-
+gait.h
+/home/quan/hexapod_service_ws/src/hexapodcontrol/src/gait.h
+ik.h
+/home/quan/hexapod_service_ws/src/hexapodcontrol/src/ik.h
+control.h
+/home/quan/hexapod_service_ws/src/hexapodcontrol/src/control.h
+
 /opt/ros/indigo/include/XmlRpcDecl.h
 ros/macros.h
 -

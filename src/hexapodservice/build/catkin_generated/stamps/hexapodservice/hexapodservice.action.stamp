@@ -5,14 +5,9 @@ int32 LEG_INDEX
 hexapodservice/legjoints ONELEG
 hexapodservice/legs ALLLEGS
 ---
-hexapodservice/legjoint ONELEG_fdbk
-hexapodservice/leg ALLLEGS_fdbk
-string result
 int32 status
-int64 freespace
-int64 minimumBufferFreeBytes
-int32 maxpoints
+int32 freespace
 bool motionActive
+string result
 ---
-hexapodservice/legjoint ONELEG_fdbk
 hexapodservice/leg ALLLEGS_fdbk

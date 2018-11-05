@@ -9,8 +9,7 @@
     <param name="publish_frequency" type="double" value="5.0"/>
   </node>
 
- <!-- <arg name="rviz_arg" value="-d $(find hexapod_gazebo_description)/hexapod_rivz.rviz"/>
-  <node pkg="rviz" type="rviz" name="rviz" args="$(arg rviz_arg)" output="screen"/>-->
-
+  <arg name="rviz_arg" value="-d $(find hexapod_gazebo_description)/hexapod_rivz.rviz"/>
+  <node pkg="rviz" type="rviz" name="rviz" args="$(arg rviz_arg)" output="screen"/>
 
 </launch>

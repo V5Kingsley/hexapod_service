@@ -54,7 +54,7 @@ CMAKE_BINARY_DIR = /home/quan/hexapod_service_ws/src/hexapodservice/build
 include CMakeFiles/_hexapodservice_generate_messages_check_deps_hexapodserviceResult.dir/progress.make
 
 CMakeFiles/_hexapodservice_generate_messages_check_deps_hexapodserviceResult:
-	catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py hexapodservice /home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg hexapodservice/legjoint:hexapodservice/leg
+	catkin_generated/env_cached.sh /usr/bin/python /opt/ros/indigo/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py hexapodservice /home/quan/hexapod_service_ws/src/hexapodservice/build/devel/share/hexapodservice/msg/hexapodserviceResult.msg 
 
 _hexapodservice_generate_messages_check_deps_hexapodserviceResult: CMakeFiles/_hexapodservice_generate_messages_check_deps_hexapodserviceResult
 _hexapodservice_generate_messages_check_deps_hexapodserviceResult: CMakeFiles/_hexapodservice_generate_messages_check_deps_hexapodserviceResult.dir/build.make

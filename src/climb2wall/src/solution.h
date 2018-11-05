@@ -20,6 +20,8 @@
 #define GROUND 1
 #define WALL 0
 
+#define MACHINE 0
+
 using std::vector;
 
 class Solution
@@ -93,6 +95,8 @@ public:
   void meclErrRecover(const int &cycle_length, hexapod_msgs::LegsJoints &legs);
   void publishMeclErrRecover();
   bool meclErrRecFeedDrivers();
+  void keepMeclErr(hexapod_msgs::LegsJoints &legs);
+  void resetMeclErr(hexapod_msgs::LegsJoints &legs);
 
   //六足客户端
   bool feedDrviers(const int leg_index);

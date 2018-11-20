@@ -61,4 +61,8 @@ CMakeFiles/link_service.dir/src/link_service.cpp.o: /opt/ros/indigo/include/rosc
 CMakeFiles/link_service.dir/src/link_service.cpp.o: /opt/ros/indigo/include/serial/serial.h
 CMakeFiles/link_service.dir/src/link_service.cpp.o: /opt/ros/indigo/include/serial/v8stdint.h
 CMakeFiles/link_service.dir/src/link_service.cpp.o: /opt/ros/indigo/include/std_msgs/String.h
+CMakeFiles/link_service.dir/src/link_service.cpp.o: devel/include/link_com/heartbag.h
+CMakeFiles/link_service.dir/src/link_service.cpp.o: devel/include/link_com/hexcom.h
+CMakeFiles/link_service.dir/src/link_service.cpp.o: devel/include/link_com/hexcomRequest.h
+CMakeFiles/link_service.dir/src/link_service.cpp.o: devel/include/link_com/hexcomResponse.h
 

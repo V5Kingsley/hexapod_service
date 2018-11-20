@@ -947,10 +947,22 @@ hexapod_gazebo_description_BINARY_DIR:STATIC=/home/quan/hexapod_service_ws/build
 hexapod_gazebo_description_SOURCE_DIR:STATIC=/home/quan/hexapod_service_ws/src/hexapod_gazebo_description
 
 //Value Computed by CMake
+hexapod_msgs_BINARY_DIR:STATIC=/home/quan/hexapod_service_ws/build/hexapod_msgs
+
+//Value Computed by CMake
+hexapod_msgs_SOURCE_DIR:STATIC=/home/quan/hexapod_service_ws/src/hexapod_msgs
+
+//Value Computed by CMake
 hexapod_sm_pos_BINARY_DIR:STATIC=/home/quan/hexapod_service_ws/build/hexapod_sm_pos
 
 //Value Computed by CMake
 hexapod_sm_pos_SOURCE_DIR:STATIC=/home/quan/hexapod_service_ws/src/hexapod_sm_pos
+
+//Value Computed by CMake
+hexapod_wall_control_BINARY_DIR:STATIC=/home/quan/hexapod_service_ws/build/hexapod_wall_control
+
+//Value Computed by CMake
+hexapod_wall_control_SOURCE_DIR:STATIC=/home/quan/hexapod_service_ws/src/hexapod_wall_control
 
 //Value Computed by CMake
 hexapodcontrol_BINARY_DIR:STATIC=/home/quan/hexapod_service_ws/build/hexapodcontrol
@@ -1213,7 +1225,7 @@ CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
 CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=6
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=9
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

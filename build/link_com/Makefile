@@ -183,51 +183,6 @@ link_client/fast:
 .PHONY : link_client/fast
 
 # Convenience name for target.
-link_com/CMakeFiles/link_service.dir/rule:
-	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f CMakeFiles/Makefile2 link_com/CMakeFiles/link_service.dir/rule
-.PHONY : link_com/CMakeFiles/link_service.dir/rule
-
-# Convenience name for target.
-link_service: link_com/CMakeFiles/link_service.dir/rule
-
-.PHONY : link_service
-
-# fast build rule for target.
-link_service/fast:
-	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f link_com/CMakeFiles/link_service.dir/build.make link_com/CMakeFiles/link_service.dir/build
-.PHONY : link_service/fast
-
-# Convenience name for target.
-link_com/CMakeFiles/_catkin_empty_exported_target.dir/rule:
-	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f CMakeFiles/Makefile2 link_com/CMakeFiles/_catkin_empty_exported_target.dir/rule
-.PHONY : link_com/CMakeFiles/_catkin_empty_exported_target.dir/rule
-
-# Convenience name for target.
-_catkin_empty_exported_target: link_com/CMakeFiles/_catkin_empty_exported_target.dir/rule
-
-.PHONY : _catkin_empty_exported_target
-
-# fast build rule for target.
-_catkin_empty_exported_target/fast:
-	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f link_com/CMakeFiles/_catkin_empty_exported_target.dir/build.make link_com/CMakeFiles/_catkin_empty_exported_target.dir/build
-.PHONY : _catkin_empty_exported_target/fast
-
-# Convenience name for target.
-link_com/CMakeFiles/link_com_genlisp.dir/rule:
-	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f CMakeFiles/Makefile2 link_com/CMakeFiles/link_com_genlisp.dir/rule
-.PHONY : link_com/CMakeFiles/link_com_genlisp.dir/rule
-
-# Convenience name for target.
-link_com_genlisp: link_com/CMakeFiles/link_com_genlisp.dir/rule
-
-.PHONY : link_com_genlisp
-
-# fast build rule for target.
-link_com_genlisp/fast:
-	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f link_com/CMakeFiles/link_com_genlisp.dir/build.make link_com/CMakeFiles/link_com_genlisp.dir/build
-.PHONY : link_com_genlisp/fast
-
-# Convenience name for target.
 link_com/CMakeFiles/_link_com_generate_messages_check_deps_heartbag.dir/rule:
 	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f CMakeFiles/Makefile2 link_com/CMakeFiles/_link_com_generate_messages_check_deps_heartbag.dir/rule
 .PHONY : link_com/CMakeFiles/_link_com_generate_messages_check_deps_heartbag.dir/rule
@@ -318,6 +273,21 @@ link_com_generate_messages_py/fast:
 .PHONY : link_com_generate_messages_py/fast
 
 # Convenience name for target.
+link_com/CMakeFiles/link_com_genlisp.dir/rule:
+	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f CMakeFiles/Makefile2 link_com/CMakeFiles/link_com_genlisp.dir/rule
+.PHONY : link_com/CMakeFiles/link_com_genlisp.dir/rule
+
+# Convenience name for target.
+link_com_genlisp: link_com/CMakeFiles/link_com_genlisp.dir/rule
+
+.PHONY : link_com_genlisp
+
+# fast build rule for target.
+link_com_genlisp/fast:
+	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f link_com/CMakeFiles/link_com_genlisp.dir/build.make link_com/CMakeFiles/link_com_genlisp.dir/build
+.PHONY : link_com_genlisp/fast
+
+# Convenience name for target.
 link_com/CMakeFiles/link_com_generate_messages.dir/rule:
 	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f CMakeFiles/Makefile2 link_com/CMakeFiles/link_com_generate_messages.dir/rule
 .PHONY : link_com/CMakeFiles/link_com_generate_messages.dir/rule
@@ -346,6 +316,21 @@ link_com_genpy: link_com/CMakeFiles/link_com_genpy.dir/rule
 link_com_genpy/fast:
 	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f link_com/CMakeFiles/link_com_genpy.dir/build.make link_com/CMakeFiles/link_com_genpy.dir/build
 .PHONY : link_com_genpy/fast
+
+# Convenience name for target.
+link_com/CMakeFiles/link_service.dir/rule:
+	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f CMakeFiles/Makefile2 link_com/CMakeFiles/link_service.dir/rule
+.PHONY : link_com/CMakeFiles/link_service.dir/rule
+
+# Convenience name for target.
+link_service: link_com/CMakeFiles/link_service.dir/rule
+
+.PHONY : link_service
+
+# fast build rule for target.
+link_service/fast:
+	cd /home/quan/hexapod_service_ws/build && $(MAKE) -f link_com/CMakeFiles/link_service.dir/build.make link_com/CMakeFiles/link_service.dir/build
+.PHONY : link_service/fast
 
 src/link_client.o: src/link_client.cpp.o
 
@@ -411,9 +396,6 @@ help:
 	@echo "... install"
 	@echo "... test"
 	@echo "... link_client"
-	@echo "... link_service"
-	@echo "... _catkin_empty_exported_target"
-	@echo "... link_com_genlisp"
 	@echo "... rebuild_cache"
 	@echo "... _link_com_generate_messages_check_deps_heartbag"
 	@echo "... _link_com_generate_messages_check_deps_hexcom"
@@ -424,8 +406,10 @@ help:
 	@echo "... link_com_gencpp"
 	@echo "... edit_cache"
 	@echo "... link_com_generate_messages_py"
+	@echo "... link_com_genlisp"
 	@echo "... link_com_generate_messages"
 	@echo "... link_com_genpy"
+	@echo "... link_service"
 	@echo "... src/link_client.o"
 	@echo "... src/link_client.i"
 	@echo "... src/link_client.s"

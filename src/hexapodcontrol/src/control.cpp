@@ -59,7 +59,7 @@ Control::Control(const std::string name, bool spin_thread) : hexapod_client_(nam
   heartbag_sub_ = nh_.subscribe<link_com::heartbag>("/hexapod_st_heartbag", 1, &Control::heartbag_Callback, this);
 
   robot_mode = hexapod_mode;
-  hexapod_mode_sub = nh_.subscribe<std_msgs::Int32>("hexapod_mode_select", 1, &Control::hexapod_mode_cb, this);
+  hexapod_mode_sub = nh_.subscribe<std_msgs::Int32>("hexapod_mode_select", 1, &Control::hexapod_mode_cb, this); //模式切换话题 1为六角形步态，2为螃蟹步态，3为爬墙模式。默认为1
   hexapod2crab_flag = false;
   crab2hexapod_flag = false;
   climb2wall_flag = false;
@@ -69,7 +69,8 @@ Control::Control(const std::string name, bool spin_thread) : hexapod_client_(nam
   ros::param::get("FEMUR_LENGTH", FEMUR_LENGTH);
   ros::param::get("TIBIA_LENGTH", TIBIA_LENGTH);
   ros::param::get("TARSUS_LENGTH", TARSUS_LENGTH);
-//符号位， 角度大于等于0时sign取1， 否则取-1
+
+  //符号位， 角度大于等于0时sign取1， 否则取-1
   for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     if (INIT_COXA_ANGLE[leg_index] >= 0)
@@ -81,14 +82,14 @@ Control::Control(const std::string name, bool spin_thread) : hexapod_client_(nam
       sign[leg_index] = -1.0;
     }
   }
-    //存储关节角角度buffer初始化
+  //存储关节角角度buffer初始化
   for (int i = 0; i < 24; i++)
   {
     posBuffer[i].reserve(3000);
   }
 }
 
-//订阅发布的速度信息
+//订阅发布的速度信息，处理上下限速度信息
 void Control::cmd_velCallback(const geometry_msgs::TwistConstPtr &cmd_vel_msg)
 {
   if (cmd_vel_msg->linear.x > linear_x_max || cmd_vel_msg->linear.x < -linear_x_max)
@@ -121,7 +122,7 @@ void Control::cmd_velCallback(const geometry_msgs::TwistConstPtr &cmd_vel_msg)
     cmd_vel_incoming_.angular.z = cmd_vel_msg->angular.z;
   }
 
-  if (robot_mode == crab_mode)
+  if (robot_mode == crab_mode) //六足处于螃蟹形态时，不接收x方向速度和自转速度
   {
     cmd_vel_incoming_.linear.x = 0;
     cmd_vel_incoming_.angular.z = 0;
@@ -164,7 +165,7 @@ void Control::publishJointStates(const hexapod_msgs::LegsJoints &legs, const int
 
   ros::Duration(0.005).sleep();
 
-  //  feet_position.publish(*feet);
+  //  feet_position.publish(*feet);  //发布足端轨迹话题
 
 #if 0
   //吸盘吸附力控制
@@ -197,16 +198,17 @@ void Control::publishJointStates(const hexapod_msgs::LegsJoints &legs, const int
 }
 
 //六足螃蟹姿态和蜘蛛姿态模式订阅回调函数，当模式改变时，置相应的模式切换标志位为真
+//六足切换到爬墙模式前需处于蜘蛛形态
 void Control::hexapod_mode_cb(const std_msgs::Int32ConstPtr &mode)
 {
   if (mode->data != robot_mode)
   {
     if (mode->data == hexapod_mode)
-      crab2hexapod_flag = (hexapod2crab_flag | climb2wall_flag) ? false : true;  //三个标志位只能有一个为真
+      crab2hexapod_flag = (hexapod2crab_flag | climb2wall_flag) ? false : true; //三个标志位只能有一个为真
 
-    if (mode->data == crab_mode && robot_mode != climb2wall_mode)                 //当执行完爬墙程序时，机器人处于螃蟹姿态
-      hexapod2crab_flag = (crab2hexapod_flag | climb2wall_flag) ? false : true;   
-    if (mode->data == crab_mode && robot_mode == climb2wall_mode)                 //此时置模式为crab_mode时，直接改变不需执行变换程序
+    if (mode->data == crab_mode && robot_mode != climb2wall_mode) //当执行完爬墙程序时，机器人处于螃蟹姿态
+      hexapod2crab_flag = (crab2hexapod_flag | climb2wall_flag) ? false : true;
+    if (mode->data == crab_mode && robot_mode == climb2wall_mode) //此时置模式为crab_mode时，直接改变不需执行变换程序
       robot_mode = crab_mode;
 
     if (mode->data == climb2wall_mode)
@@ -214,22 +216,21 @@ void Control::hexapod_mode_cb(const std_msgs::Int32ConstPtr &mode)
   }
 }
 
-
 //蜘蛛形态转为螃蟹形态控制函数
 void Control::hexapod2crab_control()
 {
   ROS_INFO("-----Hexapod2crab-----");
   hexapod_msgs::LegsJoints initLegs;
-  for(int leg_index = 0; leg_index < 6; leg_index++)
+  for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     initLegs.leg[leg_index].coxa = 0;
     initLegs.leg[leg_index].femur = 0;
     initLegs.leg[leg_index].tibia = 0;
     initLegs.leg[leg_index].tarsus = 0;
   }
-  
+
   geometry_msgs::Point initPos[6];
-  for(int leg_index = 0; leg_index < 6; leg_index++)
+  for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     positionCalculate(leg_index, initLegs.leg[leg_index], initPos[leg_index]);
   }
@@ -240,7 +241,7 @@ void Control::hexapod2crab_control()
   initLegs.leg[2].coxa = -M_PI / 3.0;
   initLegs.leg[3].coxa = M_PI / 3.0;
   initLegs.leg[5].coxa = -M_PI / 3.0;
-  for(int leg_index = 0; leg_index < 6; leg_index++)
+  for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     positionCalculate(leg_index, initLegs.leg[leg_index], finalPos[leg_index]);
   }
@@ -267,7 +268,7 @@ void Control::crab2hexapod_control()
 {
   ROS_INFO("-----Crab2hexapod-----");
   hexapod_msgs::LegsJoints initLegs;
-  for(int leg_index = 0; leg_index < 6; leg_index++)
+  for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     initLegs.leg[leg_index].coxa = 0;
     initLegs.leg[leg_index].femur = 0;
@@ -279,23 +280,22 @@ void Control::crab2hexapod_control()
   initLegs.leg[3].coxa = M_PI / 3.0;
   initLegs.leg[5].coxa = -M_PI / 3.0;
 
-  
   geometry_msgs::Point initPos[6];
-  for(int leg_index = 0; leg_index < 6; leg_index++)
+  for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     positionCalculate(leg_index, initLegs.leg[leg_index], initPos[leg_index]);
   }
 
   //计算螃蟹形态时的终止姿态
   geometry_msgs::Point finalPos[6];
-  for(int leg_index = 0; leg_index < 6; leg_index++)
+  for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     initLegs.leg[leg_index].coxa = 0;
     initLegs.leg[leg_index].femur = 0;
     initLegs.leg[leg_index].tibia = 0;
     initLegs.leg[leg_index].tarsus = 0;
   }
-  for(int leg_index = 0; leg_index < 6; leg_index++)
+  for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     positionCalculate(leg_index, initLegs.leg[leg_index], finalPos[leg_index]);
   }
@@ -304,7 +304,8 @@ void Control::crab2hexapod_control()
   initLegs.leg[0].coxa = M_PI / 3.0;
   initLegs.leg[2].coxa = -M_PI / 3.0;
   initLegs.leg[3].coxa = M_PI / 3.0;
-  initLegs.leg[5].coxa = -M_PI / 3.0;;
+  initLegs.leg[5].coxa = -M_PI / 3.0;
+  ;
 
   double liftHeight = 0.1; //抬腿高度
   int cycle_length = 1800; //1800
@@ -322,11 +323,11 @@ void Control::feedDrives(const int &cycle_period_, const bool &is_traveling_, st
   //feedDriver条件： 所给的六足速度不为0或者给的速度为0但六足仍在运动（复位周期）
   if (std::abs(cmd_vel_incoming_.linear.x) > 0.001 || std::abs(cmd_vel_incoming_.linear.y) > 0.001 || std::abs(cmd_vel_incoming_.angular.z) > 0.001 || is_traveling_ == true)
   {
-    if(robot_mode == climb2wall_mode)
-      {
-        ROS_INFO("Robot is in state of climb2wall. Please set speed to zero.");
-        return;
-      }
+    if (robot_mode == climb2wall_mode) //当六足处于爬墙模式时，不进行速度控制，直接返回
+    {
+      ROS_INFO("Robot is in state of climb2wall. Please set speed to zero.");
+      return;
+    }
 
     //status不为1或者abortMotion时，关闭算法节点
     if (motionActive_ == false)
@@ -353,16 +354,16 @@ void Control::feedDrives(const int &cycle_period_, const bool &is_traveling_, st
       {
         partitionCmd_vel(&cmd_vel_);
         gait.gaitCycle(cmd_vel_, &feet_);
-        if(robot_mode == hexapod_mode)
+        if (robot_mode == hexapod_mode)
         {
-          hexapod_ik.calculateIK(feet_, &legs_);
+          hexapod_ik.calculateIK(feet_, &legs_); //蜘蛛形态ik计算
         }
         else
         {
-          crab_ik.calculateIK(feet_, &legs_);
+          crab_ik.calculateIK(feet_, &legs_); //螃蟹形态ik计算
         }
 #if !MACHINE
-        publishJointStates(legs_, cycle_period_, cycle_leg_number_, &feet_);
+        publishJointStates(legs_, cycle_period_, cycle_leg_number_, &feet_); //发布角度话题信息，gazebo仿真
 #endif
         for (int leg_index = 0; leg_index < 6; leg_index++)
         {
@@ -372,7 +373,7 @@ void Control::feedDrives(const int &cycle_period_, const bool &is_traveling_, st
           leg_goal_.ALLLEGS.leg[leg_index].tarsus[i] = round(4096.0 * (3005640.0 / 1300.0) * (-legs_.leg[leg_index].tarsus / M_PI * 180.0) / 360.0);
         }
 
-        if (cycle_period_ == 1)
+        if (cycle_period_ == 1) //cycle_period为1时进行吸盘控制
         {
           maxpoints_ = i + 1;
           stick_control_ = true;
@@ -390,7 +391,6 @@ void Control::feedDrives(const int &cycle_period_, const bool &is_traveling_, st
         server_exists = hexapod_client_.waitForServer(ros::Duration(5.0));
       }
       hexapod_client_.sendGoal(leg_goal_, boost::bind(&Control::legcontrol_doneCb, this, _1, _2));
-      
 
       bool finished = hexapod_client_.waitForResult(ros::Duration(5.0));
       if (!finished) //未在规定时间发送成功时，关闭算法节点
@@ -407,11 +407,11 @@ void Control::feedDrives(const int &cycle_period_, const bool &is_traveling_, st
 #endif
 
 #if STICK
-      if (stick_control_)
+      if (stick_control_ || hexapod_stop_flag == true) //当吸盘控制标志位为真或六足停止复位完成时
       {
         ROS_INFO("------stick control-------");
-        ROS_INFO("io: %d, %d, %d, %d, %d, %d", cycle_leg_number_[0], cycle_leg_number_[1], cycle_leg_number_[2], cycle_leg_number_[3], cycle_leg_number_[4], cycle_leg_number_[5]);
-        ros::Duration(3).sleep();
+        //ROS_INFO("io: %d, %d, %d, %d, %d, %d", cycle_leg_number_[0], cycle_leg_number_[1], cycle_leg_number_[2], cycle_leg_number_[3], cycle_leg_number_[4], cycle_leg_number_[5]);
+        //ros::Duration(3).sleep();
 
 #if MACHINE
         //发送请求确保六足buffer已接近空
@@ -471,44 +471,40 @@ void Control::feedDrives(const int &cycle_period_, const bool &is_traveling_, st
           }
           ROS_INFO("All sticks are vacuumed.");
 
-          if (hexapod_stop_flag == true)
+          while (hexapod_stop_flag == true) /*六足停止复位完成后，新的速度到来且不为爬墙模式时才跳出循环，同时处理姿态改变*/
           {
-            partitionCmd_vel(&cmd_vel_); /*走完下一个点使得is_traveling 和smooth_base更新*/
-            gait.gaitCycle(cmd_vel_, &feet_);
-            
-            while (hexapod_stop_flag == true) /*当新的速度到来且不为爬墙模式时才跳出循环，同时处理姿态改变*/
+            if (std::abs(cmd_vel_incoming_.linear.x) > 0.001 || std::abs(cmd_vel_incoming_.linear.y) > 0.001 || std::abs(cmd_vel_incoming_.angular.z) > 0.001)
             {
-              if (std::abs(cmd_vel_incoming_.linear.x) > 0.001 || std::abs(cmd_vel_incoming_.linear.y) > 0.001 || std::abs(cmd_vel_incoming_.angular.z) > 0.001)
+              if (robot_mode == climb2wall_mode) //当处于爬墙模式时，不跳出循坏
               {
-                if (robot_mode == climb2wall_mode)  //当处于爬墙模式时，不跳出循坏
-                {
-                  ROS_INFO("Robot is in state of climb2wall. Please set speed to zero.");
-                  ros::Duration(1.0).sleep();
-                  continue;
-                }
-                hexapod_stop_flag = false; //六足停止标志位复位
-                break;
+                ROS_INFO("Robot is in state of climb2wall. Please set speed to zero.");
+                ros::Duration(1.0).sleep();
+                continue;
               }
-              ros::Duration(1.0).sleep();
-              ROS_INFO("hexapod stoped.");
-        
-              if (hexapod2crab_flag == true)  /*处理模式切换*/
-              {
-                hexapod2crab_control();
-                robot_mode = crab_mode;
-                hexapod2crab_flag = false;
-              }
-              if (crab2hexapod_flag == true)
-              {
-                crab2hexapod_control();
-                robot_mode = hexapod_mode;
-                crab2hexapod_flag = false;
-              }
-              if (climb2wall_flag == true)
-              {
-                robot_mode = climb2wall_mode;
-                climb2wall_flag = false;
-              }
+              hexapod_stop_flag = false;   //六足停止标志位复位
+              partitionCmd_vel(&cmd_vel_); /*走完下一个点使得is_traveling更新*/
+              gait.gaitCycle(cmd_vel_, &feet_); /*走完下一个点使得is_traveling更新*/
+              break;
+            }
+            ros::Duration(1.0).sleep();
+            ROS_INFO("hexapod stoped.");
+
+            if (hexapod2crab_flag == true) /*处理模式切换*/
+            {
+              hexapod2crab_control();
+              robot_mode = crab_mode;
+              hexapod2crab_flag = false;
+            }
+            if (crab2hexapod_flag == true)
+            {
+              crab2hexapod_control();
+              robot_mode = hexapod_mode;
+              crab2hexapod_flag = false;
+            }
+            if (climb2wall_flag == true)
+            {
+              robot_mode = climb2wall_mode;
+              climb2wall_flag = false;
             }
           }
         }
@@ -589,7 +585,7 @@ void Control::feedDrives(const int &cycle_period_, const bool &is_traveling_, st
       }
     }
   }
-  else   /*当六足停止时，检查姿态变换标志位，是否需要进行螃蟹姿态和蜘蛛形态的切换*/
+  else /*当六足停止时，检查姿态变换标志位，是否需要进行螃蟹姿态和蜘蛛形态的切换*/
   {
     if (hexapod2crab_flag == true)
     {
@@ -603,12 +599,11 @@ void Control::feedDrives(const int &cycle_period_, const bool &is_traveling_, st
       robot_mode = hexapod_mode;
       crab2hexapod_flag = false;
     }
-    if(climb2wall_flag == true)
+    if (climb2wall_flag == true)
     {
       robot_mode = climb2wall_mode;
       climb2wall_flag = false;
     }
-
   }
 }
 
@@ -719,13 +714,10 @@ bool Control::isStickDone(const int Reqio[])
   return true;
 }
 
-
-
-
 /*平面调整位姿*/
 void Control::legAdjustOnGround(const int leg_index, const geometry_msgs::Point &initPos, const geometry_msgs::Point &finalPos, const double liftHeight, const int cycle_length, hexapod_msgs::LegsJoints &legs)
 {
-  
+
   geometry_msgs::Point pos;
   double i = 0.0;
 
@@ -734,7 +726,7 @@ void Control::legAdjustOnGround(const int leg_index, const geometry_msgs::Point 
     posBuffer[i].clear(); //清空缓存
   }
 
-  while(i <= cycle_length)
+  while (i <= cycle_length)
   {
     interpolationOnGround(initPos, finalPos, liftHeight, i, cycle_length, pos); //插值
     jointCalculate(leg_index, pos, 0, legs.leg[leg_index]);                     //角度计算
@@ -752,7 +744,6 @@ void Control::legAdjustOnGround(const int leg_index, const geometry_msgs::Point 
       i++;
   }
   publishTransformJointStates(leg_index);
-
 }
 
 /*******************************************************************************
@@ -802,9 +793,7 @@ void Control::jointCalculate(const int leg_index, const geometry_msgs::Point &po
   leg.femur = x;
   leg.tibia = y - x;
   leg.tarsus = beta - sign[leg_index] * roll_t - y;
-
 }
-
 
 /************************************************
 *          %姿态切换发布关节角度话题%                *
@@ -812,9 +801,8 @@ void Control::jointCalculate(const int leg_index, const geometry_msgs::Point &po
 *************************************************/
 void Control::publishTransformJointStates(const int leg_index)
 {
-  if(transformFeedDrviers(leg_index) != true)
+  if (transformFeedDrviers(leg_index) != true)
     ros::shutdown();
-  
 }
 
 /******************************************************
@@ -833,12 +821,11 @@ void Control::positionCalculate(const int leg_index, const hexapod_msgs::LegJoin
   pos.z = FEMUR_LENGTH * sin(leg.femur) - TIBIA_LENGTH * cos(leg.femur + leg.tibia) - TARSUS_LENGTH * cos(leg.femur + leg.tibia + leg.tarsus);
 }
 
-
 //姿态切换发送buffer至服务器控制函数
 bool Control::transformFeedDrviers(const int leg_index)
 {
 #if MACHINE
-  maxpointsRequest();  //请求maxpoint, 取得freeSpace
+  maxpointsRequest(); //请求maxpoint, 取得freeSpace
 
   while (freeSpace_ < (sm_point_buf_size - 30)) //sm服务器buffer接近空时，进行吸盘控制
   {
@@ -855,7 +842,7 @@ bool Control::transformFeedDrviers(const int leg_index)
 #endif
 
 #if STICK
-  stickControl(leg_index);  //将相应的吸盘口关闭，放气
+  stickControl(leg_index); //将相应的吸盘口关闭，放气
 #endif
 
 #if !MACHINE
@@ -878,23 +865,22 @@ bool Control::transformFeedDrviers(const int leg_index)
     ros::Duration(0.005).sleep();
   }
 #else
-  if(legControl() != true)  //将buffer发送至服务器
+  if (legControl() != true) //将buffer发送至服务器
     return false;
 #endif
 
 #if STICK
-  stickControl(6);  //将所有的吸盘口打开，均吸气
+  stickControl(6); //将所有的吸盘口打开，均吸气
 #endif
 
   return true;
 }
 
-
 void Control::maxpointsRequest()
 {
   maxpoints_goal_.MODE = MAXPOINT_REQUEST;
   bool server_exists = hexapod_client_.waitForServer(ros::Duration(5.0));
-  while(!server_exists)
+  while (!server_exists)
   {
     ROS_WARN("Could not connect to hexapod server, retrying...");
     server_exists = hexapod_client_.waitForServer(ros::Duration(5.0));
@@ -913,7 +899,6 @@ void Control::maxpointsRequest()
     }
   }
 }
-
 
 //吸盘控制，0-5对应1-6腿的io口，对应的吸盘放气
 //6代表将所有io口设为0，即所有吸盘均吸气
@@ -970,7 +955,7 @@ void Control::stickControl(const int leg_index)
 }
 
 bool Control::legControl()
-{  
+{
   leg_goal_.MODE = ALLLEGS_CONTROL;
   leg_goal_.MAXPOINTS = posBuffer[0].size();
 

@@ -20,7 +20,7 @@
 #define GROUND 1
 #define WALL 0
 
-#define MACHINE 0
+#define MACHINE 1 //置0为gazebo仿真，置1为实体机
 
 using std::vector;
 
@@ -63,7 +63,7 @@ public:
   void positionCalculate(const int &leg_index, const hexapod_msgs::LegJoints &leg, geometry_msgs::Point &pos);
   void interpolationOnGround(const geometry_msgs::Point &initPos, const geometry_msgs::Point &finalPos, const double &liftHeight, const double &cycle_period, const int &cycle_length, geometry_msgs::Point &outputPos);
   void jointCalculate(const bool &groundOrWall, const int &leg_index, const geometry_msgs::Point &pos, const double roll_t, hexapod_msgs::LegJoints &leg);
-  void publishJointStates(const hexapod_msgs::LegsJoints &legs);
+  void rawJointStatesStore(const hexapod_msgs::LegsJoints &legs);
   void legAdjustOnGround(const int leg_index, const geometry_msgs::Point &initPos, const geometry_msgs::Point &finalPos, const double &liftHeight, const int cycle_length, hexapod_msgs::LegsJoints &legs);
   void rollTranslationLift(const bool &groundOrWall, const int &leg_index, const double &interpRoll, const double &roll_0, const double &translation, const double &height, const hexapod_msgs::LegsJoints &initLegs, hexapod_msgs::LegsJoints &legs);
   void publishRollTranslationLift(const bool &groundOrWall, const double &roll_t, const double &roll_0, const double &translation, const double &height, hexapod_msgs::LegsJoints &legs, const int cycle_length);
@@ -82,7 +82,7 @@ public:
   // void legAfterRollPosCalculate(const int &leg_index, const double &roll, hexapod_msgs::LegJoints leg, geometry_msgs::Point &pos);
   void legAfterRollPosCalculate(const int &leg_index, const double &roll, hexapod_msgs::LegJoints leg, geometry_msgs::Point &pos);
   void rightLeg2Wall(const int leg_index, const geometry_msgs::Point &initPos, const geometry_msgs::Point &finalPos, const double &roll, hexapod_msgs::LegsJoints &legs, const int cycle_length);
-  void prePress(const int leg_index, const double &prePress, const double &roll, const int &cycle_length, hexapod_msgs::LegsJoints &legs);
+  void prePress(const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs);
   void leg2SpecialPrePress(const int leg_index, const double &prePress, const double &roll, const int &cycle_length, hexapod_msgs::LegsJoints &legs);
   void cyclePosPrePress(const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs);
 
@@ -103,8 +103,8 @@ public:
   bool prePressFeedDrviers();
   bool legControlHalf();
   bool legControlRest();
-  bool prePressLegControlHalf();
-  bool prePressLegControlRest();
+  bool posBufferLegControlHalf();
+  bool posBufferLegControlRest();
   void legcontrol_doneCb(const actionlib::SimpleClientGoalState &state, const hexapodservice::hexapodserviceResultConstPtr &result);
   void maxpoint_doneCb(const actionlib::SimpleClientGoalState &state, const hexapodservice::hexapodserviceResultConstPtr &result);
   void maxpointsRequest();

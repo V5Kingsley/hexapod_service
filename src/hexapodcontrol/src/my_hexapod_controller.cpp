@@ -8,7 +8,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "my_hexapod_controller");
   Control control("hexapod_sm_service", true);
 
-  ros::AsyncSpinner spinner(3); // Using 2 threads
+  ros::AsyncSpinner spinner(3); // Using 3 threads
   spinner.start();
   ros::Rate loop_rate(control.MASTER_LOOP_RATE);
 

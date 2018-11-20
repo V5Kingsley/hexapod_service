@@ -1,0 +1,1 @@
+/usr/bin/g++-4.8 -fPIC -g  -shared -Wl,-soname,libwall_ik.so -o devel/lib/libwall_ik.so CMakeFiles/wall_ik.dir/src/ik.cpp.o 

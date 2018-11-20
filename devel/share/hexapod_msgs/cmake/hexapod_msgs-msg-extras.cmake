@@ -1,0 +1,2 @@
+set(hexapod_msgs_MESSAGE_FILES "/home/quan/hexapod_service_ws/src/hexapod_msgs/msg/LegJoints.msg;/home/quan/hexapod_service_ws/src/hexapod_msgs/msg/LegsJoints.msg;/home/quan/hexapod_service_ws/src/hexapod_msgs/msg/FeetPositions.msg;/home/quan/hexapod_service_ws/src/hexapod_msgs/msg/Pose.msg;/home/quan/hexapod_service_ws/src/hexapod_msgs/msg/RPY.msg;/home/quan/hexapod_service_ws/src/hexapod_msgs/msg/Sounds.msg")
+set(hexapod_msgs_SERVICE_FILES "")

@@ -22,8 +22,8 @@
 #include <link_com/hexcom.h>
 #include <link_com/heartbag.h>
 
-#define MACHINE 1   //仿真和实体机标志位。置0时为gazebo仿真，置1时为实体机（发送角度控制给服务器）
-#define STICK 0 //吸盘控制。置0时取消，置1开启
+#define MACHINE 0   //仿真和实体机标志位。置0时为gazebo仿真，置1时为实体机（发送角度控制给服务器）
+#define STICK 1 //吸盘控制。置0时取消，置1开启
 
 class Control
 {
@@ -50,10 +50,9 @@ public:
 
   Control(const std::string name, bool spin_thread);
 
-  void partitionCmd_vel(geometry_msgs::Twist *cmd_vel); //把速度离散化？
+  void partitionCmd_vel(geometry_msgs::Twist *cmd_vel); //把速度转换为步幅
   void publishJointStates(const hexapod_msgs::LegsJoints &legs, const int &origin_period_, std::vector<int> &cycle_leg_number_, const hexapod_msgs::FeetPositions *feet);
   int MASTER_LOOP_RATE;              // Master loop rate
-  hexapod_msgs::Pose body_;          // Body link rotation,没有用到
   hexapod_msgs::LegsJoints legs_;    //各个关节的角度信息
   hexapod_msgs::FeetPositions feet_; //足端轨迹
   geometry_msgs::Twist cmd_vel_;

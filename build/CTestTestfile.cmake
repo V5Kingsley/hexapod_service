@@ -6,7 +6,9 @@
 # testing this directory and lists subdirectories to be tested as well.
 subdirs("gtest")
 subdirs("hexapod_gazebo_description")
+subdirs("hexapod_msgs")
 subdirs("hexapod_sm_pos")
+subdirs("hexapod_wall_control")
 subdirs("link_com")
 subdirs("climb2wall")
 subdirs("hexapodcontrol")

@@ -4,11 +4,11 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "climb2wall");
   Solution Solution("hexapod_sm_service", true);
-  ros::AsyncSpinner spinner(2);
+  ros::AsyncSpinner spinner(2);  //2线程，1线程也行？
   spinner.start();
 
   //六足关节初始化
-  hexapod_msgs::LegsJoints legs;
+  hexapod_msgs::LegsJoints legs;  //全局角度变量
   for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     legs.leg[leg_index].coxa = 0;
@@ -17,15 +17,15 @@ int main(int argc, char **argv)
     legs.leg[leg_index].tarsus = 0;
   }
   int cycle_length;         //每一步周期长度
-  int prePress_cycle = 1200; //2000
-  int meclErrRecover_cycle = 800;
+  int prePress_cycle = 1200; //预压周期
+  int meclErrRecover_cycle = 800;  //机械误差恢复周期
 
-  double roll_t = 0.0;
-  double roll_0 = 0.0;
-  double prePress;
+  double roll_t = 0.0;  //终止俯仰角
+  double roll_0 = 0.0;  //初始俯仰角
+  double prePress;  //预压距离
 
   /*****************平面调整位姿*********************************/ //stepCnt = 0
-  //关节角度全为0时的初始位姿态
+  //计算关节角度全为0时的初始位姿态
   geometry_msgs::Point initPos[6];
   for (int leg_index = 0; leg_index < 6; leg_index++)
   {
@@ -52,33 +52,36 @@ int main(int argc, char **argv)
   double liftHeight = 0.1; //抬腿高度
 
   ///*调整成螃蟹姿态*///
-  cycle_length = 2000; //2800
-
+  cycle_length = 2000; 
   Solution.legAdjustOnGround(0, initPos[0], finalPos[0], liftHeight, cycle_length, legs);
   //一腿预压///
   prePress = 0.015;
-  Solution.cyclePosPrePress(0, prePress, prePress_cycle, legs);
+  //Solution.cyclePosPrePress(0, prePress, prePress_cycle, legs);
+  Solution.prePress(0, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.legAdjustOnGround(2, initPos[2], finalPos[2], liftHeight, cycle_length, legs);
   //三腿预压///
   prePress = 0.015;
-  Solution.cyclePosPrePress(2, prePress, prePress_cycle, legs);
+  //Solution.cyclePosPrePress(2, prePress, prePress_cycle, legs);
+  Solution.prePress(2, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.legAdjustOnGround(3, initPos[3], finalPos[3], liftHeight, cycle_length, legs);
   //四腿预压///
   prePress = 0.015;
-  Solution.cyclePosPrePress(3, prePress, prePress_cycle, legs);
+  //Solution.cyclePosPrePress(3, prePress, prePress_cycle, legs);
+  Solution.prePress(3, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.legAdjustOnGround(5, initPos[5], finalPos[5], liftHeight, cycle_length, legs);
   //六腿预压///
   prePress = 0.015;
-  Solution.cyclePosPrePress(5, prePress, prePress_cycle, legs);
+  //Solution.cyclePosPrePress(5, prePress, prePress_cycle, legs);
+  Solution.prePress(5, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
@@ -92,8 +95,8 @@ int main(int argc, char **argv)
   /******************抬第二腿************************/ //stepCnt = 5
   cycle_length = 3500;                                                     //3500
   Solution.legInitPos(1, legs.leg[1], 0, initPos[1]);                      //计算初始位姿
-  double distance2Wall = 0.58 - 0.02;                                      //六足中心到墙体距离 0.5
-  double givenPosZ = 0.24;                                                 //抬腿高度，相对于六足坐标系 0.300875
+  double distance2Wall = 0.58 - 0.02;       //六足中心到墙体距离0.58,二腿预留0.02距离，在二腿预压时将此距离补上
+  double givenPosZ = 0.24;                                                 //抬腿高度，相对于六足坐标系
   Solution.leftLeg2WallFinalPos(1, distance2Wall, givenPosZ, finalPos[1]); //腿上墙后的终止姿态
   Solution.leftLeg2Wall(1, initPos[1], finalPos[1], legs, cycle_length);   //腿上墙控制函数
   Solution.stepCnt++;
@@ -115,15 +118,14 @@ int main(int argc, char **argv)
 
   //二腿预压///
   prePress = 0.015;
-  //Solution.leg2SpecialPrePress(1, prePress, roll_t, prePress_cycle, legs);
   Solution.stepCnt--;   //legs的角度恢复上一步保持的误差值
   Solution.resetMeclErr(legs);   //legs的角度恢复上一步保持的误差值
-  Solution.prePress(1, prePress, roll_t, prePress_cycle, legs);
-  Solution.meclErrRecover(meclErrRecover_cycle, legs);  //此处的误差回复的是上一步的误差，如果此步也进行了误差矫正，需再次调用此函数
+  Solution.leg2SpecialPrePress(1, prePress, roll_t, prePress_cycle, legs);  //二腿预压特殊处理，修正了抬腿时预留的0.02距离
+  Solution.meclErrRecover(meclErrRecover_cycle, legs);  //此处的误差回复的是上一步的误差
   Solution.stepCnt+=2;   //stepCnt恢复
 
   /******************抬第一腿************************/  //stepCnt = 8
-  cycle_length = 3500; //3500
+  cycle_length = 3500; 
   Solution.legInitPos(0, legs.leg[0], 0, initPos[0]);
   givenPosZ = 0.15;     //抬腿高度
   distance2Wall = 0.58; //距离墙体距离
@@ -131,12 +133,9 @@ int main(int argc, char **argv)
   Solution.leftLeg2Wall(0, initPos[0], finalPos[0], legs, cycle_length);
   //一腿预压///
   prePress = 0.015;
-  Solution.prePress(0, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(0, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
-
-  // char y;
-  //std::cin>>y;
 
   /******************抬第三腿************************/  //stepCnt = 9
   cycle_length = 3500; //3500
@@ -147,7 +146,7 @@ int main(int argc, char **argv)
   Solution.leftLeg2Wall(2, initPos[2], finalPos[2], legs, cycle_length);
   //三腿预压///
   prePress = 0.015;
-  Solution.prePress(2, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(2, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
   //std::cin>>y;
@@ -164,21 +163,21 @@ int main(int argc, char **argv)
   Solution.rightLegStride(4, stride, liftHeight, initPos[4], 0, legs, cycle_length);
   //五腿预压///
   prePress = 0.015;
-  Solution.prePress(4, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(4, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.rightLegStride(3, stride, liftHeight, initPos[3], 0, legs, cycle_length); //右腿跨步函数控制
   //四腿预压///
   prePress = 0.015;
-  Solution.prePress(3, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(3, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.rightLegStride(5, stride, liftHeight, initPos[5], 0, legs, cycle_length);
   //六腿预压///
   prePress = 0.015;
-  Solution.prePress(5, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(5, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
   //std::cin>>y;
@@ -201,21 +200,21 @@ int main(int argc, char **argv)
   Solution.leftLegStride(1, stride, liftHeight, roll_t, cycle_length, legs);
   //二腿预压///
   prePress = 0.015;
-  Solution.prePress(1, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(1, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.leftLegStride(0, stride, liftHeight, roll_t, cycle_length, legs);
   //一腿预压///
   prePress = 0.015;
-  Solution.prePress(0, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(0, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.leftLegStride(2, stride, liftHeight, roll_t, cycle_length, legs);
   //三腿预压///
   prePress = 0.015;
-  Solution.prePress(2, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(2, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
   //std::cin>>y;
@@ -237,21 +236,21 @@ int main(int argc, char **argv)
   Solution.leftLegStride(4, stride, liftHeight, roll_t, cycle_length, legs);
   //五腿预压///
   prePress = 0.015;
-  Solution.prePress(4, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(4, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.leftLegStride(3, stride, liftHeight, roll_t, cycle_length, legs);
   //四腿预压///
   prePress = 0.015;
-  Solution.prePress(3, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(3, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.leftLegStride(5, stride, liftHeight, roll_t, cycle_length, legs);
   //六腿预压///
   prePress = 0.015;
-  Solution.prePress(5, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(5, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
   // std::cin>>y;
@@ -274,24 +273,23 @@ int main(int argc, char **argv)
   Solution.leftLegStride(1, stride, liftHeight, roll_t, cycle_length, legs);
   //二腿预压///
   prePress = 0.015;
-  Solution.prePress(1, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(1, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.leftLegStride(0, stride, liftHeight, roll_t, cycle_length, legs);
   //一腿预压///
   prePress = 0.015;
-  Solution.prePress(0, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(0, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.leftLegStride(2, stride, liftHeight, roll_t, cycle_length, legs);
   //三腿预压///
   prePress = 0.015;
-  Solution.prePress(2, prePress, roll_t, prePress_cycle, legs);
+  Solution.prePress(2, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
-  //std::cin>>y;
 
   /*********************重心上移****************************/
   /* roll_0 = 90.0 / 180.0 * M_PI;
@@ -322,24 +320,26 @@ int main(int argc, char **argv)
   Solution.rightLeg2Wall(4, initPos[4], initPos[1], roll_t, legs, cycle_length);
   //五腿预压///
   prePress = 0.03;
-  Solution.cyclePosPrePress(4, prePress, prePress_cycle, legs);
+  //Solution.cyclePosPrePress(4, prePress, prePress_cycle, legs);
+  Solution.prePress(4, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.rightLeg2Wall(3, initPos[3], initPos[2], roll_t, legs, cycle_length); //右腿上墙
   //四腿预压///
   prePress = 0.015;
-  Solution.cyclePosPrePress(3, prePress, prePress_cycle, legs);
+  //Solution.cyclePosPrePress(3, prePress, prePress_cycle, legs);
+  Solution.prePress(3, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
 
   Solution.rightLeg2Wall(5, initPos[5], initPos[0], roll_t, legs, cycle_length);
   //六腿预压///
   prePress = 0.015;
-  Solution.cyclePosPrePress(5, prePress, prePress_cycle, legs);
+  //Solution.cyclePosPrePress(5, prePress, prePress_cycle, legs);
+  Solution.prePress(5, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
   Solution.stepCnt++;
-  // std::cin>>y;
 
   /***********************重心下移*************************/   //stepCnt = 28
   cycle_length = 2800;                                                                //2800
@@ -349,7 +349,6 @@ int main(int argc, char **argv)
   translation = 0.0;
   Solution.publishRollTranslationLift(GROUND, roll_t, roll_0, translation, height, legs, cycle_length);
   Solution.stepCnt++;
-  // std::cin>>y;
 
   /**********************还原六足初始姿态******************************/  //stepCnt = 29
   cycle_length = 2800; //2800
@@ -384,7 +383,8 @@ int main(int argc, char **argv)
   for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     Solution.legAdjustOnGround(leg_index, initPos[leg_index], finalPos[leg_index], liftHeight, cycle_length, legs);
-    Solution.cyclePosPrePress(leg_index, prePress, prePress_cycle, legs); //预压
+    //Solution.cyclePosPrePress(leg_index, prePress, prePress_cycle, legs); //预压
+    Solution.prePress(leg_index, prePress, prePress_cycle, legs);
     Solution.meclErrRecover(meclErrRecover_cycle, legs);
     Solution.stepCnt++;
   }

@@ -155,9 +155,13 @@ void Hexapod_IK::calculateIK(const hexapod_msgs::FeetPositions &feet, hexapod_ms
 
 Crab_IK::Crab_IK()
 {
-  ros::param::get("CRAB_INIT_FOOT_POS_X", CRAB_INIT_FOOT_POS_X);
-  ros::param::get("CRAB_INIT_FOOT_POS_Y", CRAB_INIT_FOOT_POS_Y);
-  ros::param::get("CRAB_INIT_FOOT_POS_Z", CRAB_INIT_FOOT_POS_Z);
+  // ros::param::get("CRAB_INIT_FOOT_POS_X", CRAB_INIT_FOOT_POS_X);
+  // ros::param::get("CRAB_INIT_FOOT_POS_Y", CRAB_INIT_FOOT_POS_Y);
+  // ros::param::get("CRAB_INIT_FOOT_POS_Z", CRAB_INIT_FOOT_POS_Z);
+
+  ros::param::get("CRAB_AFTER_TO_WALL_INIT_FOOT_POS_X", CRAB_INIT_FOOT_POS_X);
+  ros::param::get("CRAB_AFTER_TO_WALL_INIT_FOOT_POS_Y", CRAB_INIT_FOOT_POS_Y);
+  ros::param::get("CRAB_AFTER_TO_WALL_INIT_FOOT_POS_Z", CRAB_INIT_FOOT_POS_Z);
 }
 
 void Crab_IK::calculateIK(const hexapod_msgs::FeetPositions &feet, hexapod_msgs::LegsJoints *legs)

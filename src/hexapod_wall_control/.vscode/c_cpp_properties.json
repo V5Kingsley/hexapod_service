@@ -19,8 +19,7 @@
                 "/usr/include"
             ],
             "name": "Linux",
-            "intelliSenseMode": "gcc-x64",
-            "configurationProvider": "vector-of-bool.cmake-tools"
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4

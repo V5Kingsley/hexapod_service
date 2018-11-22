@@ -28,28 +28,28 @@ The CXX compiler identification is GNU, found in "/home/quan/hexapod_service_ws/
 Determining if the C compiler works passed with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_69f91/fast"
-/usr/bin/make -f CMakeFiles/cmTC_69f91.dir/build.make CMakeFiles/cmTC_69f91.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_018e9/fast"
+/usr/bin/make -f CMakeFiles/cmTC_018e9.dir/build.make CMakeFiles/cmTC_018e9.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_69f91.dir/testCCompiler.c.o
-/usr/bin/gcc-4.8    -o CMakeFiles/cmTC_69f91.dir/testCCompiler.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTC_69f91
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_69f91.dir/link.txt --verbose=1
-/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_69f91.dir/testCCompiler.c.o  -o cmTC_69f91 
+Building C object CMakeFiles/cmTC_018e9.dir/testCCompiler.c.o
+/usr/bin/gcc-4.8    -o CMakeFiles/cmTC_018e9.dir/testCCompiler.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_018e9
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_018e9.dir/link.txt --verbose=1
+/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_018e9.dir/testCCompiler.c.o  -o cmTC_018e9 
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_19dc7/fast"
-/usr/bin/make -f CMakeFiles/cmTC_19dc7.dir/build.make CMakeFiles/cmTC_19dc7.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_e33d3/fast"
+/usr/bin/make -f CMakeFiles/cmTC_e33d3.dir/build.make CMakeFiles/cmTC_e33d3.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_19dc7.dir/CMakeCCompilerABI.c.o
-/usr/bin/gcc-4.8    -o CMakeFiles/cmTC_19dc7.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.12/Modules/CMakeCCompilerABI.c
-Linking C executable cmTC_19dc7
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_19dc7.dir/link.txt --verbose=1
-/usr/bin/gcc-4.8     -v -rdynamic CMakeFiles/cmTC_19dc7.dir/CMakeCCompilerABI.c.o  -o cmTC_19dc7 
+Building C object CMakeFiles/cmTC_e33d3.dir/CMakeCCompilerABI.c.o
+/usr/bin/gcc-4.8    -o CMakeFiles/cmTC_e33d3.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.12/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_e33d3
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e33d3.dir/link.txt --verbose=1
+/usr/bin/gcc-4.8     -v -rdynamic CMakeFiles/cmTC_e33d3.dir/CMakeCCompilerABI.c.o  -o cmTC_e33d3 
 Using built-in specs.
 COLLECT_GCC=/usr/bin/gcc-4.8
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper
@@ -59,8 +59,8 @@ Thread model: posix
 gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.4) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_19dc7' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_19dc7 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTC_19dc7.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_e33d3' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_e33d3 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTC_e33d3.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
@@ -68,14 +68,14 @@ Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_19dc7/fast"]
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_19dc7.dir/build.make CMakeFiles/cmTC_19dc7.dir/build]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_e33d3/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_e33d3.dir/build.make CMakeFiles/cmTC_e33d3.dir/build]
   ignore line: [make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp']
-  ignore line: [Building C object CMakeFiles/cmTC_19dc7.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/usr/bin/gcc-4.8    -o CMakeFiles/cmTC_19dc7.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.12/Modules/CMakeCCompilerABI.c]
-  ignore line: [Linking C executable cmTC_19dc7]
-  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_19dc7.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/gcc-4.8     -v -rdynamic CMakeFiles/cmTC_19dc7.dir/CMakeCCompilerABI.c.o  -o cmTC_19dc7 ]
+  ignore line: [Building C object CMakeFiles/cmTC_e33d3.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/gcc-4.8    -o CMakeFiles/cmTC_e33d3.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.12/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_e33d3]
+  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e33d3.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/gcc-4.8     -v -rdynamic CMakeFiles/cmTC_e33d3.dir/CMakeCCompilerABI.c.o  -o cmTC_e33d3 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/gcc-4.8]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper]
@@ -85,8 +85,8 @@ Parsed C implicit link information from above output:
   ignore line: [gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.4) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_19dc7' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_19dc7 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTC_19dc7.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_e33d3' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_e33d3 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTC_e33d3.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/collect2] ==> ignore
     arg [--sysroot=/] ==> ignore
     arg [--build-id] ==> ignore
@@ -100,7 +100,7 @@ Parsed C implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_19dc7] ==> ignore
+    arg [cmTC_e33d3] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o] ==> ignore
@@ -112,7 +112,7 @@ Parsed C implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../..]
-    arg [CMakeFiles/cmTC_19dc7.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTC_e33d3.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-lgcc] ==> lib [gcc]
     arg [--as-needed] ==> ignore
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -142,14 +142,14 @@ Parsed C implicit link information from above output:
 Detecting C [-std=c11] compiler features compiled with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_f1052/fast"
-/usr/bin/make -f CMakeFiles/cmTC_f1052.dir/build.make CMakeFiles/cmTC_f1052.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_93c5a/fast"
+/usr/bin/make -f CMakeFiles/cmTC_93c5a.dir/build.make CMakeFiles/cmTC_93c5a.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_f1052.dir/feature_tests.c.o
-/usr/bin/gcc-4.8   -std=c11 -o CMakeFiles/cmTC_f1052.dir/feature_tests.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_f1052
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f1052.dir/link.txt --verbose=1
-/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_f1052.dir/feature_tests.c.o  -o cmTC_f1052 
+Building C object CMakeFiles/cmTC_93c5a.dir/feature_tests.c.o
+/usr/bin/gcc-4.8   -std=c11 -o CMakeFiles/cmTC_93c5a.dir/feature_tests.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_93c5a
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_93c5a.dir/link.txt --verbose=1
+/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_93c5a.dir/feature_tests.c.o  -o cmTC_93c5a 
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
@@ -162,14 +162,14 @@ make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_contr
 Detecting C [-std=c99] compiler features compiled with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_64052/fast"
-/usr/bin/make -f CMakeFiles/cmTC_64052.dir/build.make CMakeFiles/cmTC_64052.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_53c6f/fast"
+/usr/bin/make -f CMakeFiles/cmTC_53c6f.dir/build.make CMakeFiles/cmTC_53c6f.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_64052.dir/feature_tests.c.o
-/usr/bin/gcc-4.8   -std=c99 -o CMakeFiles/cmTC_64052.dir/feature_tests.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_64052
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_64052.dir/link.txt --verbose=1
-/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_64052.dir/feature_tests.c.o  -o cmTC_64052 
+Building C object CMakeFiles/cmTC_53c6f.dir/feature_tests.c.o
+/usr/bin/gcc-4.8   -std=c99 -o CMakeFiles/cmTC_53c6f.dir/feature_tests.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_53c6f
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_53c6f.dir/link.txt --verbose=1
+/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_53c6f.dir/feature_tests.c.o  -o cmTC_53c6f 
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
@@ -182,14 +182,14 @@ make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_contr
 Detecting C [-std=c90] compiler features compiled with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_b4f46/fast"
-/usr/bin/make -f CMakeFiles/cmTC_b4f46.dir/build.make CMakeFiles/cmTC_b4f46.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_8da02/fast"
+/usr/bin/make -f CMakeFiles/cmTC_8da02.dir/build.make CMakeFiles/cmTC_8da02.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_b4f46.dir/feature_tests.c.o
-/usr/bin/gcc-4.8   -std=c90 -o CMakeFiles/cmTC_b4f46.dir/feature_tests.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_b4f46
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b4f46.dir/link.txt --verbose=1
-/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_b4f46.dir/feature_tests.c.o  -o cmTC_b4f46 
+Building C object CMakeFiles/cmTC_8da02.dir/feature_tests.c.o
+/usr/bin/gcc-4.8   -std=c90 -o CMakeFiles/cmTC_8da02.dir/feature_tests.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_8da02
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8da02.dir/link.txt --verbose=1
+/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_8da02.dir/feature_tests.c.o  -o cmTC_8da02 
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
@@ -200,28 +200,28 @@ make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_contr
 Determining if the CXX compiler works passed with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_6e211/fast"
-/usr/bin/make -f CMakeFiles/cmTC_6e211.dir/build.make CMakeFiles/cmTC_6e211.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_84ff0/fast"
+/usr/bin/make -f CMakeFiles/cmTC_84ff0.dir/build.make CMakeFiles/cmTC_84ff0.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_6e211.dir/testCXXCompiler.cxx.o
-/usr/bin/g++-4.8     -o CMakeFiles/cmTC_6e211.dir/testCXXCompiler.cxx.o -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
-Linking CXX executable cmTC_6e211
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6e211.dir/link.txt --verbose=1
-/usr/bin/g++-4.8       -rdynamic CMakeFiles/cmTC_6e211.dir/testCXXCompiler.cxx.o  -o cmTC_6e211 
+Building CXX object CMakeFiles/cmTC_84ff0.dir/testCXXCompiler.cxx.o
+/usr/bin/g++-4.8     -o CMakeFiles/cmTC_84ff0.dir/testCXXCompiler.cxx.o -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_84ff0
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_84ff0.dir/link.txt --verbose=1
+/usr/bin/g++-4.8       -rdynamic CMakeFiles/cmTC_84ff0.dir/testCXXCompiler.cxx.o  -o cmTC_84ff0 
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_3b733/fast"
-/usr/bin/make -f CMakeFiles/cmTC_3b733.dir/build.make CMakeFiles/cmTC_3b733.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_ccc97/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ccc97.dir/build.make CMakeFiles/cmTC_ccc97.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_3b733.dir/CMakeCXXCompilerABI.cpp.o
-/usr/bin/g++-4.8     -o CMakeFiles/cmTC_3b733.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.12/Modules/CMakeCXXCompilerABI.cpp
-Linking CXX executable cmTC_3b733
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3b733.dir/link.txt --verbose=1
-/usr/bin/g++-4.8      -v -rdynamic CMakeFiles/cmTC_3b733.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_3b733 
+Building CXX object CMakeFiles/cmTC_ccc97.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/g++-4.8     -o CMakeFiles/cmTC_ccc97.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.12/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_ccc97
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ccc97.dir/link.txt --verbose=1
+/usr/bin/g++-4.8      -v -rdynamic CMakeFiles/cmTC_ccc97.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_ccc97 
 Using built-in specs.
 COLLECT_GCC=/usr/bin/g++-4.8
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper
@@ -231,8 +231,8 @@ Thread model: posix
 gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.4) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_3b733' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_3b733 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTC_3b733.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_ccc97' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_ccc97 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTC_ccc97.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
@@ -240,14 +240,14 @@ Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_3b733/fast"]
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_3b733.dir/build.make CMakeFiles/cmTC_3b733.dir/build]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_ccc97/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_ccc97.dir/build.make CMakeFiles/cmTC_ccc97.dir/build]
   ignore line: [make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp']
-  ignore line: [Building CXX object CMakeFiles/cmTC_3b733.dir/CMakeCXXCompilerABI.cpp.o]
-  ignore line: [/usr/bin/g++-4.8     -o CMakeFiles/cmTC_3b733.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.12/Modules/CMakeCXXCompilerABI.cpp]
-  ignore line: [Linking CXX executable cmTC_3b733]
-  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3b733.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/g++-4.8      -v -rdynamic CMakeFiles/cmTC_3b733.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_3b733 ]
+  ignore line: [Building CXX object CMakeFiles/cmTC_ccc97.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/g++-4.8     -o CMakeFiles/cmTC_ccc97.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.12/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_ccc97]
+  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ccc97.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/g++-4.8      -v -rdynamic CMakeFiles/cmTC_ccc97.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_ccc97 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/g++-4.8]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper]
@@ -257,8 +257,8 @@ Parsed CXX implicit link information from above output:
   ignore line: [gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.4) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_3b733' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_3b733 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTC_3b733.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_ccc97' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_ccc97 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTC_ccc97.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/collect2] ==> ignore
     arg [--sysroot=/] ==> ignore
     arg [--build-id] ==> ignore
@@ -272,7 +272,7 @@ Parsed CXX implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_3b733] ==> ignore
+    arg [cmTC_ccc97] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o] ==> ignore
@@ -284,7 +284,7 @@ Parsed CXX implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../..]
-    arg [CMakeFiles/cmTC_3b733.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [CMakeFiles/cmTC_ccc97.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
     arg [-lstdc++] ==> lib [stdc++]
     arg [-lm] ==> lib [m]
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -312,14 +312,14 @@ Parsed CXX implicit link information from above output:
 Detecting CXX [-std=c++1y] compiler features compiled with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_93837/fast"
-/usr/bin/make -f CMakeFiles/cmTC_93837.dir/build.make CMakeFiles/cmTC_93837.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_3306e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_3306e.dir/build.make CMakeFiles/cmTC_3306e.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_93837.dir/feature_tests.cxx.o
-/usr/bin/g++-4.8    -std=c++1y -o CMakeFiles/cmTC_93837.dir/feature_tests.cxx.o -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_93837
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_93837.dir/link.txt --verbose=1
-/usr/bin/g++-4.8       -rdynamic CMakeFiles/cmTC_93837.dir/feature_tests.cxx.o  -o cmTC_93837 
+Building CXX object CMakeFiles/cmTC_3306e.dir/feature_tests.cxx.o
+/usr/bin/g++-4.8    -std=c++1y -o CMakeFiles/cmTC_3306e.dir/feature_tests.cxx.o -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_3306e
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3306e.dir/link.txt --verbose=1
+/usr/bin/g++-4.8       -rdynamic CMakeFiles/cmTC_3306e.dir/feature_tests.cxx.o  -o cmTC_3306e 
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
@@ -385,14 +385,14 @@ make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_contr
 Detecting CXX [-std=c++11] compiler features compiled with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_05db9/fast"
-/usr/bin/make -f CMakeFiles/cmTC_05db9.dir/build.make CMakeFiles/cmTC_05db9.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_4f1d7/fast"
+/usr/bin/make -f CMakeFiles/cmTC_4f1d7.dir/build.make CMakeFiles/cmTC_4f1d7.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_05db9.dir/feature_tests.cxx.o
-/usr/bin/g++-4.8    -std=c++11 -o CMakeFiles/cmTC_05db9.dir/feature_tests.cxx.o -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_05db9
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_05db9.dir/link.txt --verbose=1
-/usr/bin/g++-4.8       -rdynamic CMakeFiles/cmTC_05db9.dir/feature_tests.cxx.o  -o cmTC_05db9 
+Building CXX object CMakeFiles/cmTC_4f1d7.dir/feature_tests.cxx.o
+/usr/bin/g++-4.8    -std=c++11 -o CMakeFiles/cmTC_4f1d7.dir/feature_tests.cxx.o -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_4f1d7
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4f1d7.dir/link.txt --verbose=1
+/usr/bin/g++-4.8       -rdynamic CMakeFiles/cmTC_4f1d7.dir/feature_tests.cxx.o  -o cmTC_4f1d7 
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
@@ -458,14 +458,14 @@ make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_contr
 Detecting CXX [-std=c++98] compiler features compiled with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_5f2f3/fast"
-/usr/bin/make -f CMakeFiles/cmTC_5f2f3.dir/build.make CMakeFiles/cmTC_5f2f3.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_66919/fast"
+/usr/bin/make -f CMakeFiles/cmTC_66919.dir/build.make CMakeFiles/cmTC_66919.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_5f2f3.dir/feature_tests.cxx.o
-/usr/bin/g++-4.8    -std=c++98 -o CMakeFiles/cmTC_5f2f3.dir/feature_tests.cxx.o -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_5f2f3
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5f2f3.dir/link.txt --verbose=1
-/usr/bin/g++-4.8       -rdynamic CMakeFiles/cmTC_5f2f3.dir/feature_tests.cxx.o  -o cmTC_5f2f3 
+Building CXX object CMakeFiles/cmTC_66919.dir/feature_tests.cxx.o
+/usr/bin/g++-4.8    -std=c++98 -o CMakeFiles/cmTC_66919.dir/feature_tests.cxx.o -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_66919
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_66919.dir/link.txt --verbose=1
+/usr/bin/g++-4.8       -rdynamic CMakeFiles/cmTC_66919.dir/feature_tests.cxx.o  -o cmTC_66919 
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
@@ -529,28 +529,28 @@ make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_contr
 Determining if the include file pthread.h exists passed with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_8a693/fast"
-/usr/bin/make -f CMakeFiles/cmTC_8a693.dir/build.make CMakeFiles/cmTC_8a693.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_b3c0b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_b3c0b.dir/build.make CMakeFiles/cmTC_b3c0b.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_8a693.dir/CheckIncludeFile.c.o
-/usr/bin/gcc-4.8    -o CMakeFiles/cmTC_8a693.dir/CheckIncludeFile.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
-Linking C executable cmTC_8a693
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8a693.dir/link.txt --verbose=1
-/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_8a693.dir/CheckIncludeFile.c.o  -o cmTC_8a693 
+Building C object CMakeFiles/cmTC_b3c0b.dir/CheckIncludeFile.c.o
+/usr/bin/gcc-4.8    -o CMakeFiles/cmTC_b3c0b.dir/CheckIncludeFile.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_b3c0b
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b3c0b.dir/link.txt --verbose=1
+/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_b3c0b.dir/CheckIncludeFile.c.o  -o cmTC_b3c0b 
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 
 Determining if the function pthread_create exists in the pthread passed with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_d3121/fast"
-/usr/bin/make -f CMakeFiles/cmTC_d3121.dir/build.make CMakeFiles/cmTC_d3121.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_390e5/fast"
+/usr/bin/make -f CMakeFiles/cmTC_390e5.dir/build.make CMakeFiles/cmTC_390e5.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_d3121.dir/CheckFunctionExists.c.o
-/usr/bin/gcc-4.8   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_d3121.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
-Linking C executable cmTC_d3121
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d3121.dir/link.txt --verbose=1
-/usr/bin/gcc-4.8  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_d3121.dir/CheckFunctionExists.c.o  -o cmTC_d3121 -lpthread 
+Building C object CMakeFiles/cmTC_390e5.dir/CheckFunctionExists.c.o
+/usr/bin/gcc-4.8   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_390e5.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_390e5
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_390e5.dir/link.txt --verbose=1
+/usr/bin/gcc-4.8  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_390e5.dir/CheckFunctionExists.c.o  -o cmTC_390e5 -lpthread 
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
 
 

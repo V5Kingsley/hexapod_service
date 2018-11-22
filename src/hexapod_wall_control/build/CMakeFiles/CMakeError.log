@@ -1,20 +1,20 @@
 Determining if the pthread_create exist failed with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_beb33/fast"
-/usr/bin/make -f CMakeFiles/cmTC_beb33.dir/build.make CMakeFiles/cmTC_beb33.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_e3842/fast"
+/usr/bin/make -f CMakeFiles/cmTC_e3842.dir/build.make CMakeFiles/cmTC_e3842.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_beb33.dir/CheckSymbolExists.c.o
-/usr/bin/gcc-4.8    -o CMakeFiles/cmTC_beb33.dir/CheckSymbolExists.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
-Linking C executable cmTC_beb33
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_beb33.dir/link.txt --verbose=1
-/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_beb33.dir/CheckSymbolExists.c.o  -o cmTC_beb33 
-CMakeFiles/cmTC_beb33.dir/CheckSymbolExists.c.o：在函数‘main’中：
+Building C object CMakeFiles/cmTC_e3842.dir/CheckSymbolExists.c.o
+/usr/bin/gcc-4.8    -o CMakeFiles/cmTC_e3842.dir/CheckSymbolExists.c.o   -c /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_e3842
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e3842.dir/link.txt --verbose=1
+/usr/bin/gcc-4.8      -rdynamic CMakeFiles/cmTC_e3842.dir/CheckSymbolExists.c.o  -o cmTC_e3842 
+CMakeFiles/cmTC_e3842.dir/CheckSymbolExists.c.o：在函数‘main’中：
 CheckSymbolExists.c:(.text+0x16)：对‘pthread_create’未定义的引用
 collect2: error: ld returned 1 exit status
-make[1]: *** [cmTC_beb33] 错误 1
+make[1]: *** [cmTC_e3842] 错误 1
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-make: *** [cmTC_beb33/fast] 错误 2
+make: *** [cmTC_e3842/fast] 错误 2
 
 File /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
 /* */
@@ -34,18 +34,18 @@ int main(int argc, char** argv)
 Determining if the function pthread_create exists in the pthreads failed with the following output:
 Change Dir: /home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_5992d/fast"
-/usr/bin/make -f CMakeFiles/cmTC_5992d.dir/build.make CMakeFiles/cmTC_5992d.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_bce2f/fast"
+/usr/bin/make -f CMakeFiles/cmTC_bce2f.dir/build.make CMakeFiles/cmTC_bce2f.dir/build
 make[1]: 正在进入目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_5992d.dir/CheckFunctionExists.c.o
-/usr/bin/gcc-4.8   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_5992d.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
-Linking C executable cmTC_5992d
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5992d.dir/link.txt --verbose=1
-/usr/bin/gcc-4.8  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_5992d.dir/CheckFunctionExists.c.o  -o cmTC_5992d -lpthreads 
+Building C object CMakeFiles/cmTC_bce2f.dir/CheckFunctionExists.c.o
+/usr/bin/gcc-4.8   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_bce2f.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_bce2f
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bce2f.dir/link.txt --verbose=1
+/usr/bin/gcc-4.8  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_bce2f.dir/CheckFunctionExists.c.o  -o cmTC_bce2f -lpthreads 
 /usr/bin/ld: 找不到 -lpthreads
 collect2: error: ld returned 1 exit status
-make[1]: *** [cmTC_5992d] 错误 1
+make[1]: *** [cmTC_bce2f] 错误 1
 make[1]:正在离开目录 `/home/quan/hexapod_service_ws/src/hexapod_wall_control/build/CMakeFiles/CMakeTmp'
-make: *** [cmTC_5992d/fast] 错误 2
+make: *** [cmTC_bce2f/fast] 错误 2
 
 

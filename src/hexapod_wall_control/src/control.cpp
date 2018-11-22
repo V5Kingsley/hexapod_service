@@ -5,7 +5,7 @@
  *          Version number:  0.00           *
  *          Date:                           *
  * *****************************************/
-
+ 
 #include "control.h"
 
 Control::Control(const std::string name, bool spin_thread) : hexapod_client_(name, spin_thread)
@@ -58,7 +58,7 @@ Control::Control(const std::string name, bool spin_thread) : hexapod_client_(nam
   stick_client_ = nh_.serviceClient<link_com::hexcom>("hexapod_st_service");
   heartbag_sub_ = nh_.subscribe<link_com::heartbag>("/hexapod_st_heartbag", 1, &Control::heartbag_Callback, this);
 
-  robot_mode = hexapod_mode;
+  robot_mode = climb2wall_mode;
   hexapod_mode_sub = nh_.subscribe<std_msgs::Int32>("hexapod_mode_select", 1, &Control::hexapod_mode_cb, this); //模式切换话题 1为六角形步态，2为螃蟹步态，3为爬墙模式。默认为1
   hexapod2crab_flag = false;
   crab2hexapod_flag = false;
@@ -91,39 +91,61 @@ Control::Control(const std::string name, bool spin_thread) : hexapod_client_(nam
   ros::param::get("JOINT_MECHANICAL_ERROR_UNIT", MeclErrUnit);
   ros::param::get("JOINT_MECHANICAL_ERROR", MeclErr);
 
-//蜘蛛形态沿x，y，z正负方向运动差补比重
-  ros::param::get("HEX_X_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", HEXxPosDirnMeclErrBalnRate);
-  ros::param::get("HEX_X_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", HEXxNegDirnMeclErrBalnRate);
-  ros::param::get("HEX_Y_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", HEXyPosDirnMeclErrBalnRate);
-  ros::param::get("HEX_Y_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", HEXyNegDirnMeclErrBalnRate);
-  ros::param::get("HEX_Z_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", HEXzPosDirnMeclErrBalnRate);
-  ros::param::get("HEX_Z_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", HEXzNegDirnMeclErrBalnRate);
+  //蜘蛛形态沿x，y，z正负方向运动差补比重
+  ros::param::get("HEX_X_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", HEXxPosDirnMeclErrBalnRate1st);
+  ros::param::get("HEX_X_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", HEXxNegDirnMeclErrBalnRate1st);
+  ros::param::get("HEX_Y_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", HEXyPosDirnMeclErrBalnRate1st);
+  ros::param::get("HEX_Y_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", HEXyNegDirnMeclErrBalnRate1st);
+  ros::param::get("HEX_Z_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", HEXzPosDirnMeclErrBalnRate1st);
+  ros::param::get("HEX_Z_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", HEXzNegDirnMeclErrBalnRate1st);
 
-//螃蟹形态沿x，y，z正负方向运动差补比重
-  ros::param::get("CRAB_X_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", CRABxPosDirnMeclErrBalnRate);
-  ros::param::get("CRAB_X_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", CRABxNegDirnMeclErrBalnRate);
-  ros::param::get("CRAB_Y_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", CRAByPosDirnMeclErrBalnRate);
-  ros::param::get("CRAB_Y_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", CRAByNegDirnMeclErrBalnRate);
-  ros::param::get("CRAB_Z_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", CRABzPosDirnMeclErrBalnRate);
-  ros::param::get("CRAB_Z_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE", CRABzNegDirnMeclErrBalnRate);
+  ros::param::get("HEX_X_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", HEXxPosDirnMeclErrBalnRate2nd);
+  ros::param::get("HEX_X_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", HEXxNegDirnMeclErrBalnRate2nd);
+  ros::param::get("HEX_Y_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", HEXyPosDirnMeclErrBalnRate2nd);
+  ros::param::get("HEX_Y_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", HEXyNegDirnMeclErrBalnRate2nd);
+  ros::param::get("HEX_Z_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", HEXzPosDirnMeclErrBalnRate2nd);
+  ros::param::get("HEX_Z_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", HEXzNegDirnMeclErrBalnRate2nd);
 
-//蜘蛛形态转换成螃蟹形态的机械误差差补比重，分成4步，分别为1腿摆动、3腿摆动、4腿摆动、6腿摆动
+  //螃蟹形态沿x，y，z正负方向运动差补比重
+  ros::param::get("CRAB_X_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", CRABxPosDirnMeclErrBalnRate1st);
+  ros::param::get("CRAB_X_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", CRABxNegDirnMeclErrBalnRate1st);
+  ros::param::get("CRAB_Y_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", CRAByPosDirnMeclErrBalnRate1st);
+  ros::param::get("CRAB_Y_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", CRAByNegDirnMeclErrBalnRate1st);
+  ros::param::get("CRAB_Z_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", CRABzPosDirnMeclErrBalnRate1st);
+  ros::param::get("CRAB_Z_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_1st_STEP", CRABzNegDirnMeclErrBalnRate1st);
+
+  ros::param::get("CRAB_X_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", CRABxPosDirnMeclErrBalnRate2nd);
+  ros::param::get("CRAB_X_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", CRABxNegDirnMeclErrBalnRate2nd);
+  ros::param::get("CRAB_Y_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", CRAByPosDirnMeclErrBalnRate2nd);
+  ros::param::get("CRAB_Y_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", CRAByNegDirnMeclErrBalnRate2nd);
+  ros::param::get("CRAB_Z_POS_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", CRABzPosDirnMeclErrBalnRate2nd);
+  ros::param::get("CRAB_Z_NEG_DIRECTION_MECHANICAL_ERROR_BALANCE_RATE_2nd_STEP", CRABzNegDirnMeclErrBalnRate2nd);
+
+  //蜘蛛形态转换成螃蟹形态的机械误差差补比重，分成4步，分别为1腿摆动、3腿摆动、4腿摆动、6腿摆动
   ros::param::get("HEXAPOD_TO_CRAB_LEG1MOVE_MECHANICAL_ERROR_BALANCE_RATE", hex2crabMeclErrBalnRateLeg1);
   hex2crabMeclErrBalnRate.push_back(hex2crabMeclErrBalnRateLeg1);
+  ros::param::get("HEXAPOD_TO_CRAB_LEG2MOVE_MECHANICAL_ERROR_BALANCE_RATE", hex2crabMeclErrBalnRateLeg2);
+  hex2crabMeclErrBalnRate.push_back(hex2crabMeclErrBalnRateLeg2);
   ros::param::get("HEXAPOD_TO_CRAB_LEG3MOVE_MECHANICAL_ERROR_BALANCE_RATE", hex2crabMeclErrBalnRateLeg3);
   hex2crabMeclErrBalnRate.push_back(hex2crabMeclErrBalnRateLeg3);
   ros::param::get("HEXAPOD_TO_CRAB_LEG4MOVE_MECHANICAL_ERROR_BALANCE_RATE", hex2crabMeclErrBalnRateLeg4);
   hex2crabMeclErrBalnRate.push_back(hex2crabMeclErrBalnRateLeg4);
+  ros::param::get("HEXAPOD_TO_CRAB_LEG5MOVE_MECHANICAL_ERROR_BALANCE_RATE", hex2crabMeclErrBalnRateLeg5);
+  hex2crabMeclErrBalnRate.push_back(hex2crabMeclErrBalnRateLeg5);
   ros::param::get("HEXAPOD_TO_CRAB_LEG6MOVE_MECHANICAL_ERROR_BALANCE_RATE", hex2crabMeclErrBalnRateLeg6);
   hex2crabMeclErrBalnRate.push_back(hex2crabMeclErrBalnRateLeg6);
 
-//螃蟹形态转换成蜘蛛形态的机械误差差补比重，分成4步，分别为1腿摆动、3腿摆动、4腿摆动、6腿摆动
+  //螃蟹形态转换成蜘蛛形态的机械误差差补比重，分成4步，分别为1腿摆动、3腿摆动、4腿摆动、6腿摆动
   ros::param::get("CRAB_TO_HEXAPOD_LEG1MOVE_MECHANICAL_ERROR_BALANCE_RATE", crab2hexMeclErrBalnRateLeg1);
   crab2hexMeclErrBalnRate.push_back(crab2hexMeclErrBalnRateLeg1);
+  ros::param::get("CRAB_TO_HEXAPOD_LEG2MOVE_MECHANICAL_ERROR_BALANCE_RATE", crab2hexMeclErrBalnRateLeg2);
+  crab2hexMeclErrBalnRate.push_back(crab2hexMeclErrBalnRateLeg2);
   ros::param::get("CRAB_TO_HEXAPOD_LEG3MOVE_MECHANICAL_ERROR_BALANCE_RATE", crab2hexMeclErrBalnRateLeg3);
   crab2hexMeclErrBalnRate.push_back(crab2hexMeclErrBalnRateLeg3);
   ros::param::get("CRAB_TO_HEXAPOD_LEG4MOVE_MECHANICAL_ERROR_BALANCE_RATE", crab2hexMeclErrBalnRateLeg4);
   crab2hexMeclErrBalnRate.push_back(crab2hexMeclErrBalnRateLeg4);
+  ros::param::get("CRAB_TO_HEXAPOD_LEG5MOVE_MECHANICAL_ERROR_BALANCE_RATE", crab2hexMeclErrBalnRateLeg5);
+  crab2hexMeclErrBalnRate.push_back(crab2hexMeclErrBalnRateLeg5);
   ros::param::get("CRAB_TO_HEXAPOD_LEG6MOVE_MECHANICAL_ERROR_BALANCE_RATE", crab2hexMeclErrBalnRateLeg6);
   crab2hexMeclErrBalnRate.push_back(crab2hexMeclErrBalnRateLeg6);
 
@@ -136,33 +158,32 @@ Control::Control(const std::string name, bool spin_thread) : hexapod_client_(nam
 //只接收一个方向的速度
 void Control::cmd_velCallback(const geometry_msgs::TwistConstPtr &cmd_vel_msg)
 {
-  if(std::abs(cmd_vel_msg->linear.x) > 0.001)
+  if (std::abs(cmd_vel_msg->linear.x) > 0.001)
   {
-    if(std::abs(cmd_vel_msg->linear.y) > 0.001 || std::abs(cmd_vel_msg->angular.z) > 0.001)
+    if (std::abs(cmd_vel_msg->linear.y) > 0.001 || std::abs(cmd_vel_msg->angular.z) > 0.001)
     {
       ROS_WARN("ERROR SPEED. Only single direction is accepted.");
+      return;
     }
-    return;
   }
 
-  if(std::abs(cmd_vel_msg->linear.y) > 0.001)
+  if (std::abs(cmd_vel_msg->linear.y) > 0.001)
   {
-    if(std::abs(cmd_vel_msg->linear.x) > 0.001 || std::abs(cmd_vel_msg->angular.z) > 0.001)
+    if (std::abs(cmd_vel_msg->linear.x) > 0.001 || std::abs(cmd_vel_msg->angular.z) > 0.001)
     {
       ROS_WARN("ERROR SPEED. Only single direction is accepted.");
+      return;
     }
-    return;
   }
 
-  if(std::abs(cmd_vel_msg->angular.z) > 0.001)
+  if (std::abs(cmd_vel_msg->angular.z) > 0.001)
   {
-    if(std::abs(cmd_vel_msg->linear.x) > 0.001 || std::abs(cmd_vel_msg->linear.y) > 0.001)
+    if (std::abs(cmd_vel_msg->linear.x) > 0.001 || std::abs(cmd_vel_msg->linear.y) > 0.001)
     {
       ROS_WARN("ERROR SPEED. Only single direction is accepted.");
+      return;
     }
-    return;
   }
-
 
   if (cmd_vel_msg->linear.x > linear_x_max || cmd_vel_msg->linear.x < -linear_x_max)
   {
@@ -310,13 +331,39 @@ void Control::hexapod2crab_control()
 
   //计算螃蟹形态时的终止姿态
   geometry_msgs::Point finalPos[6];
-  legs_.leg[0].coxa = M_PI / 3.0;
-  legs_.leg[2].coxa = -M_PI / 3.0;
-  legs_.leg[3].coxa = M_PI / 3.0;
-  legs_.leg[5].coxa = -M_PI / 3.0;
+  hexapod_msgs::LegsJoints finalLegs;
+  finalLegs.leg[0].coxa = 1.0471975511965979;
+  finalLegs.leg[0].femur = -0.038758520830718061;
+  finalLegs.leg[0].tibia = -0.22365627124495968;
+  finalLegs.leg[0].tarsus = 0.26241479207567775;
+
+  finalLegs.leg[1].coxa = 0;
+  finalLegs.leg[1].femur = -0.059724262471019439;
+  finalLegs.leg[1].tibia = -0.16509683859324015;
+  finalLegs.leg[1].tarsus =  0.22482110106425959;
+
+  finalLegs.leg[2].coxa = -1.0471975511965979;
+  finalLegs.leg[2].femur = -0.038758537257535017;
+  finalLegs.leg[2].tibia = -0.22365627515359282;
+  finalLegs.leg[2].tarsus = 0.26241481241112785;
+
+  finalLegs.leg[3].coxa = 1.0471975511965979;
+  finalLegs.leg[3].femur = -0.018897554015098201;
+  finalLegs.leg[3].tibia = -0.24467115841576767;
+  finalLegs.leg[3].tarsus = 0.26356871243086588;
+
+  finalLegs.leg[4].coxa = 0;
+  finalLegs.leg[4].femur = -0.036513660820203096;
+  finalLegs.leg[4].tibia = -0.19001813422958463;
+  finalLegs.leg[4].tarsus = 0.22653179504978774;
+
+  finalLegs.leg[5].coxa = -1.0471975511965979;
+  finalLegs.leg[5].femur = -0.018897537546665254;
+  finalLegs.leg[5].tibia = -0.24467115439928608;
+  finalLegs.leg[5].tarsus = 0.26356869194595134;
   for (int leg_index = 0; leg_index < 6; leg_index++)
   {
-    positionCalculate(leg_index, legs_.leg[leg_index], finalPos[leg_index]);
+    positionCalculate(leg_index, finalLegs.leg[leg_index], finalPos[leg_index]);
   }
 
   //还原关节角度为0
@@ -328,11 +375,10 @@ void Control::hexapod2crab_control()
   double liftHeight = 0.1; //抬腿高度
   int cycle_length = 1800; //1800
 
-  legAdjustOnGround(HEX2CRAB, 0, initPos[0], finalPos[0], liftHeight, cycle_length, legs_);
-  legAdjustOnGround(HEX2CRAB, 2, initPos[2], finalPos[2], liftHeight, cycle_length, legs_);
-  legAdjustOnGround(HEX2CRAB, 3, initPos[3], finalPos[3], liftHeight, cycle_length, legs_);
-  legAdjustOnGround(HEX2CRAB, 5, initPos[5], finalPos[5], liftHeight, cycle_length, legs_);
-
+  for(int leg_index = 0; leg_index < 6; leg_index++)
+  {
+    legAdjustOnGround(HEX2CRAB, leg_index, initPos[leg_index], finalPos[leg_index], liftHeight, cycle_length, legs_);
+  }
   ROS_INFO("Hexapod2crab finished. Now robot is in state of crab.");
 }
 
@@ -341,7 +387,7 @@ void Control::crab2hexapod_control()
 {
   ROS_INFO("-----Crab2hexapod-----");
 
-  for (int leg_index = 0; leg_index < 6; leg_index++)
+/*  for (int leg_index = 0; leg_index < 6; leg_index++)
   {
     legs_.leg[leg_index].coxa = 0;
     legs_.leg[leg_index].femur = 0;
@@ -351,7 +397,37 @@ void Control::crab2hexapod_control()
   legs_.leg[0].coxa = M_PI / 3.0;
   legs_.leg[2].coxa = -M_PI / 3.0;
   legs_.leg[3].coxa = M_PI / 3.0;
-  legs_.leg[5].coxa = -M_PI / 3.0;
+  legs_.leg[5].coxa = -M_PI / 3.0;*/
+
+  legs_.leg[0].coxa = 1.0471975511965979;
+  legs_.leg[0].femur = -0.038758520830718061;
+  legs_.leg[0].tibia = -0.22365627124495968;
+  legs_.leg[0].tarsus = 0.26241479207567775;
+
+  legs_.leg[1].coxa = 0;
+  legs_.leg[1].femur = -0.059724262471019439;
+  legs_.leg[1].tibia = -0.16509683859324015;
+  legs_.leg[1].tarsus =  0.22482110106425959;
+
+  legs_.leg[2].coxa = -1.0471975511965979;
+  legs_.leg[2].femur = -0.038758537257535017;
+  legs_.leg[2].tibia = -0.22365627515359282;
+  legs_.leg[2].tarsus = 0.26241481241112785;
+
+  legs_.leg[3].coxa = 1.0471975511965979;
+  legs_.leg[3].femur = -0.018897554015098201;
+  legs_.leg[3].tibia = -0.24467115841576767;
+  legs_.leg[3].tarsus = 0.26356871243086588;
+
+  legs_.leg[4].coxa = 0;
+  legs_.leg[4].femur = -0.036513660820203096;
+  legs_.leg[4].tibia = -0.19001813422958463;
+  legs_.leg[4].tarsus = 0.22653179504978774;
+
+  legs_.leg[5].coxa = -1.0471975511965979;
+  legs_.leg[5].femur = -0.018897537546665254;
+  legs_.leg[5].tibia = -0.24467115439928608;
+  legs_.leg[5].tarsus = 0.26356869194595134;
 
   geometry_msgs::Point initPos[6];
   for (int leg_index = 0; leg_index < 6; leg_index++)
@@ -359,34 +435,28 @@ void Control::crab2hexapod_control()
     positionCalculate(leg_index, legs_.leg[leg_index], initPos[leg_index]);
   }
 
-  //计算螃蟹形态时的终止姿态
+  //计算蜘蛛形态时的终止姿态
   geometry_msgs::Point finalPos[6];
+  hexapod_msgs::LegsJoints finalLegs;
   for (int leg_index = 0; leg_index < 6; leg_index++)
   {
-    legs_.leg[leg_index].coxa = 0;
-    legs_.leg[leg_index].femur = 0;
-    legs_.leg[leg_index].tibia = 0;
-    legs_.leg[leg_index].tarsus = 0;
+    finalLegs.leg[leg_index].coxa = 0;
+    finalLegs.leg[leg_index].femur = 0;
+    finalLegs.leg[leg_index].tibia = 0;
+    finalLegs.leg[leg_index].tarsus = 0;
   }
   for (int leg_index = 0; leg_index < 6; leg_index++)
   {
-    positionCalculate(leg_index, legs_.leg[leg_index], finalPos[leg_index]);
+    positionCalculate(leg_index, finalLegs.leg[leg_index], finalPos[leg_index]);
   }
-
-  //还原关节角度为0
-  legs_.leg[0].coxa = M_PI / 3.0;
-  legs_.leg[2].coxa = -M_PI / 3.0;
-  legs_.leg[3].coxa = M_PI / 3.0;
-  legs_.leg[5].coxa = -M_PI / 3.0;
-  ;
 
   double liftHeight = 0.1; //抬腿高度
   int cycle_length = 1800; //1800
 
-  legAdjustOnGround(CRAB2HEX, 0, initPos[0], finalPos[0], liftHeight, cycle_length, legs_);
-  legAdjustOnGround(CRAB2HEX, 2, initPos[2], finalPos[2], liftHeight, cycle_length, legs_);
-  legAdjustOnGround(CRAB2HEX, 3, initPos[3], finalPos[3], liftHeight, cycle_length, legs_);
-  legAdjustOnGround(CRAB2HEX, 5, initPos[5], finalPos[5], liftHeight, cycle_length, legs_);
+  for(int leg_index = 0; leg_index < 6; leg_index++)
+  {
+    legAdjustOnGround(CRAB2HEX, leg_index, initPos[leg_index], finalPos[leg_index], liftHeight, cycle_length, legs_);
+  }
   ROS_INFO("Crab2hexapod finished. Now robot is in state of hexapod.");
 }
 
@@ -402,7 +472,7 @@ void Control::feedDrives(const int &cycle_period_, std::vector<int> &cycle_leg_n
       return;
     }
 
-    geometry_msgs::Twist cmd_vel_step;  //每次运动的步幅
+    geometry_msgs::Twist cmd_vel_step; //每次运动的步幅
     cmd_vel_step.linear.x = cmd_vel_.linear.x;
     cmd_vel_step.linear.y = cmd_vel_.linear.y;
     cmd_vel_step.angular.z = cmd_vel_.angular.z;
@@ -410,36 +480,72 @@ void Control::feedDrives(const int &cycle_period_, std::vector<int> &cycle_leg_n
     maxpoints_ = gait.getCycleLength(cmd_vel_step); //获取周期长度
 
     //机械误差赋值，分x，y，z正负方向共六种
-    std::vector<float> MeclErrBalnRate;
-    if (robot_mode == hexapod_mode)  //蜘蛛形态运动时的误差
+    std::vector< std::vector<float> > MeclErrBalnRate;
+    if (robot_mode == hexapod_mode) //蜘蛛形态运动时的误差
     {
       if (cmd_vel_step.linear.x > 0.001)
-        MeclErrBalnRate.assign(HEXxPosDirnMeclErrBalnRate.begin(), HEXxPosDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(HEXxPosDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(HEXxPosDirnMeclErrBalnRate2nd);
+      }
       else if (cmd_vel_step.linear.x < -0.001)
-        MeclErrBalnRate.assign(HEXxNegDirnMeclErrBalnRate.begin(), HEXxNegDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(HEXxNegDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(HEXxNegDirnMeclErrBalnRate2nd);
+      }
       else if (cmd_vel_step.linear.y > 0.001)
-        MeclErrBalnRate.assign(HEXyPosDirnMeclErrBalnRate.begin(), HEXyPosDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(HEXyPosDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(HEXyPosDirnMeclErrBalnRate2nd);
+      }
       else if (cmd_vel_step.linear.y < -0.001)
-        MeclErrBalnRate.assign(HEXyNegDirnMeclErrBalnRate.begin(), HEXyNegDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(HEXyNegDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(HEXyNegDirnMeclErrBalnRate2nd);
+      }
       else if (cmd_vel_step.angular.z > 0.001)
-        MeclErrBalnRate.assign(HEXzPosDirnMeclErrBalnRate.begin(), HEXzPosDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(HEXzPosDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(HEXzPosDirnMeclErrBalnRate2nd);
+      }
       else if (cmd_vel_step.angular.z < -0.001)
-        MeclErrBalnRate.assign(HEXzNegDirnMeclErrBalnRate.begin(), HEXzNegDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(HEXzNegDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(HEXzNegDirnMeclErrBalnRate2nd);
+      }
     }
-    else   //螃蟹形态时的误差
+    else //螃蟹形态时的误差
     {
       if (cmd_vel_step.linear.x > 0.001)
-        MeclErrBalnRate.assign(CRABxPosDirnMeclErrBalnRate.begin(), CRABxPosDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(CRABxPosDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(CRABxPosDirnMeclErrBalnRate2nd);
+      }
       else if (cmd_vel_step.linear.x < -0.001)
-        MeclErrBalnRate.assign(CRABxNegDirnMeclErrBalnRate.begin(), CRABxNegDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(CRABxNegDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(CRABxNegDirnMeclErrBalnRate2nd);
+      }
       else if (cmd_vel_step.linear.y > 0.001)
-        MeclErrBalnRate.assign(CRAByPosDirnMeclErrBalnRate.begin(), CRAByPosDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(CRAByPosDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(CRAByPosDirnMeclErrBalnRate2nd);
+      }
       else if (cmd_vel_step.linear.y < -0.001)
-        MeclErrBalnRate.assign(CRAByNegDirnMeclErrBalnRate.begin(), CRAByNegDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(CRAByNegDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(CRAByNegDirnMeclErrBalnRate2nd);
+      }
       else if (cmd_vel_step.angular.z > 0.001)
-        MeclErrBalnRate.assign(CRABzPosDirnMeclErrBalnRate.begin(), CRABzPosDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(CRABzPosDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(CRABzPosDirnMeclErrBalnRate2nd);
+      }
       else if (cmd_vel_step.angular.z < -0.001)
-        MeclErrBalnRate.assign(CRABzNegDirnMeclErrBalnRate.begin(), CRABzNegDirnMeclErrBalnRate.end());
+      {
+        MeclErrBalnRate.push_back(CRABzNegDirnMeclErrBalnRate1st);
+        MeclErrBalnRate.push_back(CRABzNegDirnMeclErrBalnRate2nd);
+      }
     }
 
     //每一次运动由两部分组成，两部分运动完后六足处于原始姿态
@@ -530,7 +636,7 @@ void Control::feedDrives(const int &cycle_period_, std::vector<int> &cycle_leg_n
           crab_ik.calculateIK(feet_, &legs_); //螃蟹形态ik计算
         }
 
-        walkGaitMeclErrCompensate(legs_, MeclErrBalnRate, i, maxpoints_); //加入机械误差补偿
+        walkGaitMeclErrCompensate(legs_, MeclErrBalnRate[gaitCnt], i, maxpoints_); //加入机械误差补偿
 
 #if !MACHINE
         publishJointStates(legs_, cycle_period_, cycle_leg_number_, &feet_); //发布角度话题信息，gazebo仿真
@@ -573,7 +679,7 @@ void Control::feedDrives(const int &cycle_period_, std::vector<int> &cycle_leg_n
 
       /****************预压*************************/
 
-      walkGaitPrePress(cycle_leg_number_, PREPRESS, PREPRESS_CYCLE_LENGTH, MeclErrBalnRate, legs_);
+      walkGaitPrePress(cycle_leg_number_, PREPRESS, PREPRESS_CYCLE_LENGTH, MeclErrBalnRate[gaitCnt], legs_);
 
       /***********************误差恢复*************************************/
       for (int i = 0; i < 24; i++)
@@ -584,23 +690,23 @@ void Control::feedDrives(const int &cycle_period_, std::vector<int> &cycle_leg_n
       hexapod_msgs::LegsJoints initlegs;
       for (int leg_index = 0; leg_index < 6; leg_index++)
       {
-        initlegs.leg[leg_index].coxa = legs_.leg[leg_index].coxa - MeclErrUnit * MeclErr[leg_index * 4] * MeclErrBalnRate[leg_index * 4];
-        initlegs.leg[leg_index].femur = legs_.leg[leg_index].femur - MeclErrUnit * MeclErr[leg_index * 4 + 1] * MeclErrBalnRate[leg_index * 4 + 1];
-        initlegs.leg[leg_index].tibia = legs_.leg[leg_index].tibia - MeclErrUnit * MeclErr[leg_index * 4 + 2] * MeclErrBalnRate[leg_index * 4 + 2];
-        initlegs.leg[leg_index].tarsus = legs_.leg[leg_index].tarsus - MeclErrUnit * MeclErr[leg_index * 4 + 3] * MeclErrBalnRate[leg_index * 4 + 3];
+        initlegs.leg[leg_index].coxa = legs_.leg[leg_index].coxa - MeclErrUnit * MeclErr[leg_index * 4] * MeclErrBalnRate[gaitCnt][leg_index * 4];
+        initlegs.leg[leg_index].femur = legs_.leg[leg_index].femur - MeclErrUnit * MeclErr[leg_index * 4 + 1] * MeclErrBalnRate[gaitCnt][leg_index * 4 + 1];
+        initlegs.leg[leg_index].tibia = legs_.leg[leg_index].tibia - MeclErrUnit * MeclErr[leg_index * 4 + 2] * MeclErrBalnRate[gaitCnt][leg_index * 4 + 2];
+        initlegs.leg[leg_index].tarsus = legs_.leg[leg_index].tarsus - MeclErrUnit * MeclErr[leg_index * 4 + 3] * MeclErrBalnRate[gaitCnt][leg_index * 4 + 3];
       }
       //用三角函数将角度从加入机械误差后的角度恢复至原始角度
       for (int i = 0; i <= meclRecoverLength; i++)
       {
         for (int leg_index = 0; leg_index < 6; leg_index++)
         {
-          legs_.leg[leg_index].coxa = 0.5 * MeclErrUnit * MeclErr[leg_index * 4] * MeclErrBalnRate[leg_index * 4] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].coxa + 0.5 * MeclErrUnit * MeclErr[leg_index * 4] * MeclErrBalnRate[leg_index * 4];
+          legs_.leg[leg_index].coxa = 0.5 * MeclErrUnit * MeclErr[leg_index * 4] * MeclErrBalnRate[gaitCnt][leg_index * 4] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].coxa + 0.5 * MeclErrUnit * MeclErr[leg_index * 4] * MeclErrBalnRate[gaitCnt][leg_index * 4];
 
-          legs_.leg[leg_index].femur = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 1] * MeclErrBalnRate[leg_index * 4 + 1] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].femur + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 1] * MeclErrBalnRate[leg_index * 4 + 1];
+          legs_.leg[leg_index].femur = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 1] * MeclErrBalnRate[gaitCnt][leg_index * 4 + 1] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].femur + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 1] * MeclErrBalnRate[gaitCnt][leg_index * 4 + 1];
 
-          legs_.leg[leg_index].tibia = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 2] * MeclErrBalnRate[leg_index * 4 + 2] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].tibia + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 2] * MeclErrBalnRate[leg_index * 4 + 2];
+          legs_.leg[leg_index].tibia = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 2] * MeclErrBalnRate[gaitCnt][leg_index * 4 + 2] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].tibia + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 2] * MeclErrBalnRate[gaitCnt][leg_index * 4 + 2];
 
-          legs_.leg[leg_index].tarsus = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * MeclErrBalnRate[leg_index * 4 + 3] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].tarsus + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * MeclErrBalnRate[leg_index * 4 + 3];
+          legs_.leg[leg_index].tarsus = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * MeclErrBalnRate[gaitCnt][leg_index * 4 + 3] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].tarsus + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * MeclErrBalnRate[gaitCnt][leg_index * 4 + 3];
         }
         //将角度值填充进posBuffer缓存
         for (int leg_index = 0; leg_index < 6; leg_index++)
@@ -1097,7 +1203,7 @@ void Control::legAdjustOnGround(const int MODE, const int leg_index, const geome
     posBuffer[i].clear(); //清空缓存
   }
 
-//1、3、4、6腿摆动分别对应hex2crabMeclErrBalnRate中的4步
+  /*//1、3、4、6腿摆动分别对应hex2crabMeclErrBalnRate中的4步
   int modeTransmStep;
   if (leg_index == 0)
     modeTransmStep = 0;
@@ -1106,7 +1212,7 @@ void Control::legAdjustOnGround(const int MODE, const int leg_index, const geome
   if (leg_index == 3)
     modeTransmStep = 2;
   if (leg_index == 5)
-    modeTransmStep = 3;
+    modeTransmStep = 3;*/
 
   while (i <= cycle_length)
   {
@@ -1119,18 +1225,18 @@ void Control::legAdjustOnGround(const int MODE, const int leg_index, const geome
       {
       case HEX2CRAB: //hex2crab在posBuffer中加入误差补偿
       {
-        posBuffer[leg * 4].push_back(legs.leg[leg].coxa + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4] * hex2crabMeclErrBalnRate[modeTransmStep][leg * 4]);
-        posBuffer[leg * 4 + 1].push_back(legs.leg[leg].femur + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 1] * hex2crabMeclErrBalnRate[modeTransmStep][leg * 4 + 1]);
-        posBuffer[leg * 4 + 2].push_back(legs.leg[leg].tibia + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 2] * hex2crabMeclErrBalnRate[modeTransmStep][leg * 4 + 2]);
-        posBuffer[leg * 4 + 3].push_back(legs.leg[leg].tarsus + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 3] * hex2crabMeclErrBalnRate[modeTransmStep][leg * 4 + 3]);
+        posBuffer[leg * 4].push_back(legs.leg[leg].coxa + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4] * hex2crabMeclErrBalnRate[leg_index][leg * 4]);
+        posBuffer[leg * 4 + 1].push_back(legs.leg[leg].femur + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 1] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 1]);
+        posBuffer[leg * 4 + 2].push_back(legs.leg[leg].tibia + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 2] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 2]);
+        posBuffer[leg * 4 + 3].push_back(legs.leg[leg].tarsus + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 3] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 3]);
       }
       break;
-      case CRAB2HEX:  //crab2hex在posBuffer中加入误差补偿
+      case CRAB2HEX: //crab2hex在posBuffer中加入误差补偿
       {
-        posBuffer[leg * 4].push_back(legs.leg[leg].coxa + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4] * crab2hexMeclErrBalnRate[modeTransmStep][leg * 4]);
-        posBuffer[leg * 4 + 1].push_back(legs.leg[leg].femur + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 1] * crab2hexMeclErrBalnRate[modeTransmStep][leg * 4 + 1]);
-        posBuffer[leg * 4 + 2].push_back(legs.leg[leg].tibia + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 2] * crab2hexMeclErrBalnRate[modeTransmStep][leg * 4 + 2]);
-        posBuffer[leg * 4 + 3].push_back(legs.leg[leg].tarsus + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 3] * crab2hexMeclErrBalnRate[modeTransmStep][leg * 4 + 3]);
+        posBuffer[leg * 4].push_back(legs.leg[leg].coxa + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4] * crab2hexMeclErrBalnRate[leg_index][leg * 4]);
+        posBuffer[leg * 4 + 1].push_back(legs.leg[leg].femur + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 1] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 1]);
+        posBuffer[leg * 4 + 2].push_back(legs.leg[leg].tibia + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 2] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 2]);
+        posBuffer[leg * 4 + 3].push_back(legs.leg[leg].tarsus + double(i) / double(cycle_length) * MeclErrUnit * MeclErr[leg * 4 + 3] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 3]);
       }
       break;
       }
@@ -1142,7 +1248,7 @@ void Control::legAdjustOnGround(const int MODE, const int leg_index, const geome
   }
   publishTransformJointStates(leg_index);
 
-  modeTransmPrePress(MODE, modeTransmStep, leg_index, PREPRESS, PREPRESS_CYCLE_LENGTH, legs);
+  modeTransmPrePress(MODE, leg_index, PREPRESS, PREPRESS_CYCLE_LENGTH, legs);
 
   /***********************误差恢复*************************************/
   for (int i = 0; i < 24; i++)
@@ -1151,24 +1257,24 @@ void Control::legAdjustOnGround(const int MODE, const int leg_index, const geome
   }
   // 缓存恢复后的角度
   hexapod_msgs::LegsJoints initlegs;
-  for (int leg_index = 0; leg_index < 6; leg_index++)
+  for (int leg = 0; leg < 6; leg++)
   {
     switch (MODE)
     {
     case HEX2CRAB:
     {
-      initlegs.leg[leg_index].coxa = legs.leg[leg_index].coxa - MeclErrUnit * MeclErr[leg_index * 4] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4];
-      initlegs.leg[leg_index].femur = legs.leg[leg_index].femur - MeclErrUnit * MeclErr[leg_index * 4 + 1] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4 + 1];
-      initlegs.leg[leg_index].tibia = legs.leg[leg_index].tibia - MeclErrUnit * MeclErr[leg_index * 4 + 2] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4 + 2];
-      initlegs.leg[leg_index].tarsus = legs.leg[leg_index].tarsus - MeclErrUnit * MeclErr[leg_index * 4 + 3] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4 + 3];
+      initlegs.leg[leg].coxa = legs.leg[leg].coxa - MeclErrUnit * MeclErr[leg * 4] * hex2crabMeclErrBalnRate[leg_index][leg * 4];
+      initlegs.leg[leg].femur = legs.leg[leg].femur - MeclErrUnit * MeclErr[leg * 4 + 1] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 1];
+      initlegs.leg[leg].tibia = legs.leg[leg].tibia - MeclErrUnit * MeclErr[leg * 4 + 2] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 2];
+      initlegs.leg[leg].tarsus = legs.leg[leg].tarsus - MeclErrUnit * MeclErr[leg * 4 + 3] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 3];
     }
     break;
     case CRAB2HEX:
     {
-      initlegs.leg[leg_index].coxa = legs.leg[leg_index].coxa - MeclErrUnit * MeclErr[leg_index * 4] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4];
-      initlegs.leg[leg_index].femur = legs.leg[leg_index].femur - MeclErrUnit * MeclErr[leg_index * 4 + 1] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4 + 1];
-      initlegs.leg[leg_index].tibia = legs.leg[leg_index].tibia - MeclErrUnit * MeclErr[leg_index * 4 + 2] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4 + 2];
-      initlegs.leg[leg_index].tarsus = legs.leg[leg_index].tarsus - MeclErrUnit * MeclErr[leg_index * 4 + 3] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4 + 3];
+      initlegs.leg[leg].coxa = legs.leg[leg].coxa - MeclErrUnit * MeclErr[leg * 4] * crab2hexMeclErrBalnRate[leg_index][leg * 4];
+      initlegs.leg[leg].femur = legs.leg[leg].femur - MeclErrUnit * MeclErr[leg * 4 + 1] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 1];
+      initlegs.leg[leg].tibia = legs.leg[leg].tibia - MeclErrUnit * MeclErr[leg * 4 + 2] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 2];
+      initlegs.leg[leg].tarsus = legs.leg[leg].tarsus - MeclErrUnit * MeclErr[leg * 4 + 3] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 3];
     }
     break;
     }
@@ -1176,41 +1282,41 @@ void Control::legAdjustOnGround(const int MODE, const int leg_index, const geome
   //用三角函数将角度从加入机械误差后的角度恢复至原始角度
   for (int i = 0; i <= meclRecoverLength; i++)
   {
-    for (int leg_index = 0; leg_index < 6; leg_index++)
+    for (int leg = 0; leg < 6; leg++)
     {
       switch (MODE)
       {
       case HEX2CRAB:
       {
-        legs.leg[leg_index].coxa = 0.5 * MeclErrUnit * MeclErr[leg_index * 4] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].coxa + 0.5 * MeclErrUnit * MeclErr[leg_index * 4] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4];
+        legs.leg[leg].coxa = 0.5 * MeclErrUnit * MeclErr[leg * 4] * hex2crabMeclErrBalnRate[leg_index][leg * 4] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg].coxa + 0.5 * MeclErrUnit * MeclErr[leg * 4] * hex2crabMeclErrBalnRate[leg_index][leg * 4];
 
-        legs.leg[leg_index].femur = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 1] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4 + 1] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].femur + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 1] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4 + 1];
+        legs.leg[leg].femur = 0.5 * MeclErrUnit * MeclErr[leg * 4 + 1] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 1] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg].femur + 0.5 * MeclErrUnit * MeclErr[leg * 4 + 1] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 1];
 
-        legs.leg[leg_index].tibia = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 2] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4 + 2] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].tibia + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 2] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4 + 2];
+        legs.leg[leg].tibia = 0.5 * MeclErrUnit * MeclErr[leg * 4 + 2] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 2] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg].tibia + 0.5 * MeclErrUnit * MeclErr[leg * 4 + 2] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 2];
 
-        legs.leg[leg_index].tarsus = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4 + 3] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].tarsus + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * hex2crabMeclErrBalnRate[modeTransmStep][leg_index * 4 + 3];
+        legs.leg[leg].tarsus = 0.5 * MeclErrUnit * MeclErr[leg * 4 + 3] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 3] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg].tarsus + 0.5 * MeclErrUnit * MeclErr[leg * 4 + 3] * hex2crabMeclErrBalnRate[leg_index][leg * 4 + 3];
       }
       break;
       case CRAB2HEX:
       {
-        legs.leg[leg_index].coxa = 0.5 * MeclErrUnit * MeclErr[leg_index * 4] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].coxa + 0.5 * MeclErrUnit * MeclErr[leg_index * 4] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4];
+        legs.leg[leg].coxa = 0.5 * MeclErrUnit * MeclErr[leg * 4] * crab2hexMeclErrBalnRate[leg_index][leg * 4] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg].coxa + 0.5 * MeclErrUnit * MeclErr[leg * 4] * crab2hexMeclErrBalnRate[leg_index][leg * 4];
 
-        legs.leg[leg_index].femur = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 1] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4 + 1] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].femur + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 1] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4 + 1];
+        legs.leg[leg].femur = 0.5 * MeclErrUnit * MeclErr[leg * 4 + 1] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 1] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg].femur + 0.5 * MeclErrUnit * MeclErr[leg * 4 + 1] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 1];
 
-        legs.leg[leg_index].tibia = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 2] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4 + 2] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].tibia + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 2] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4 + 2];
+        legs.leg[leg].tibia = 0.5 * MeclErrUnit * MeclErr[leg * 4 + 2] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 2] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg].tibia + 0.5 * MeclErrUnit * MeclErr[leg * 4 + 2] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 2];
 
-        legs.leg[leg_index].tarsus = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4 + 3] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg_index].tarsus + 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * crab2hexMeclErrBalnRate[modeTransmStep][leg_index * 4 + 3];
+        legs.leg[leg].tarsus = 0.5 * MeclErrUnit * MeclErr[leg * 4 + 3] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 3] * cos(M_PI * i / meclRecoverLength) + initlegs.leg[leg].tarsus + 0.5 * MeclErrUnit * MeclErr[leg * 4 + 3] * crab2hexMeclErrBalnRate[leg_index][leg * 4 + 3];
       }
       break;
       }
     }
     //将角度值填充进posBuffer缓存
-    for (int leg_index = 0; leg_index < 6; leg_index++)
+    for (int leg = 0; leg < 6; leg++)
     {
-      posBuffer[leg_index * 4].push_back(legs.leg[leg_index].coxa);
-      posBuffer[leg_index * 4 + 1].push_back(legs.leg[leg_index].femur);
-      posBuffer[leg_index * 4 + 2].push_back(legs.leg[leg_index].tibia);
-      posBuffer[leg_index * 4 + 3].push_back(legs.leg[leg_index].tarsus);
+      posBuffer[leg * 4].push_back(legs.leg[leg].coxa);
+      posBuffer[leg * 4 + 1].push_back(legs.leg[leg].femur);
+      posBuffer[leg * 4 + 2].push_back(legs.leg[leg].tibia);
+      posBuffer[leg * 4 + 3].push_back(legs.leg[leg].tarsus);
     }
   }
 #if MACHINE
@@ -1488,12 +1594,11 @@ bool Control::legControl()
   return true;
 }
 
-
 /************************************************
 *               %姿态切换预压程序%                 *
 *                                                *
 *************************************************/
-void Control::modeTransmPrePress(const int MODE, const int modeTransmStep, const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
+void Control::modeTransmPrePress(const int MODE, const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
 {
   hexapod_msgs::LegJoints initLeg; //缓存初始关节角
 
@@ -1503,18 +1608,18 @@ void Control::modeTransmPrePress(const int MODE, const int modeTransmStep, const
     {
     case HEX2CRAB:
     {
-      legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErr[i * 4] * hex2crabMeclErrBalnRate[modeTransmStep][i * 4];
-      legs.leg[i].femur = legs.leg[i].femur + MeclErrUnit * MeclErr[i * 4 + 1] * hex2crabMeclErrBalnRate[modeTransmStep][i * 4 + 1];
-      legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErr[i * 4 + 2] * hex2crabMeclErrBalnRate[modeTransmStep][i * 4 + 2];
-      legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErr[i * 4 + 3] * hex2crabMeclErrBalnRate[modeTransmStep][i * 4 + 3];
+      legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErr[i * 4] * hex2crabMeclErrBalnRate[leg_index][i * 4];
+      legs.leg[i].femur = legs.leg[i].femur + MeclErrUnit * MeclErr[i * 4 + 1] * hex2crabMeclErrBalnRate[leg_index][i * 4 + 1];
+      legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErr[i * 4 + 2] * hex2crabMeclErrBalnRate[leg_index][i * 4 + 2];
+      legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErr[i * 4 + 3] * hex2crabMeclErrBalnRate[leg_index][i * 4 + 3];
     }
     break;
     case CRAB2HEX:
     {
-      legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErr[i * 4] * crab2hexMeclErrBalnRate[modeTransmStep][i * 4];
-      legs.leg[i].femur = legs.leg[i].femur + MeclErrUnit * MeclErr[i * 4 + 1] * crab2hexMeclErrBalnRate[modeTransmStep][i * 4 + 1];
-      legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErr[i * 4 + 2] * crab2hexMeclErrBalnRate[modeTransmStep][i * 4 + 2];
-      legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErr[i * 4 + 3] * crab2hexMeclErrBalnRate[modeTransmStep][i * 4 + 3];
+      legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErr[i * 4] * crab2hexMeclErrBalnRate[leg_index][i * 4];
+      legs.leg[i].femur = legs.leg[i].femur + MeclErrUnit * MeclErr[i * 4 + 1] * crab2hexMeclErrBalnRate[leg_index][i * 4 + 1];
+      legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErr[i * 4 + 2] * crab2hexMeclErrBalnRate[leg_index][i * 4 + 2];
+      legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErr[i * 4 + 3] * crab2hexMeclErrBalnRate[leg_index][i * 4 + 3];
     }
     break;
     }
@@ -1570,7 +1675,6 @@ void Control::modeTransmPrePress(const int MODE, const int modeTransmStep, const
   publishModeTransmPrePressPos();
 }
 
-
 //将posBuffer预压角度缓存发至gazebo话题或填充六足服务器
 void Control::publishModeTransmPrePressPos()
 {
@@ -1600,7 +1704,6 @@ void Control::publishModeTransmPrePressPos()
   if (modeTransmPrePressFeedDrivers() != true)
     ros::shutdown();
 }
-
 
 //将posBuffer预压角度缓存填充至六足服务器
 bool Control::modeTransmPrePressFeedDrivers()

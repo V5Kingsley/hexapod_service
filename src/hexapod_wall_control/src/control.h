@@ -21,9 +21,9 @@
 #include <sensor_msgs/JointState.h>
 #include <link_com/hexcom.h>
 #include <link_com/heartbag.h>
-
-#define MACHINE 1   //仿真和实体机标志位。置0时为gazebo仿真，置1时为实体机（发送角度控制给服务器）
-#define STICK 1 //吸盘控制。置0时取消，置1开启
+ 
+#define MACHINE 0    //仿真和实体机标志位。置0时为gazebo仿真，置1时为实体机（发送角度控制给服务器）
+#define STICK 0 //吸盘控制。置0时取消，置1开启
 
 enum{HEX2CRAB, CRAB2HEX};
 
@@ -140,19 +140,34 @@ private:
 
   float MeclErrUnit;
   std::vector<float> MeclErr;
-  std::vector<float> HEXxPosDirnMeclErrBalnRate;
-  std::vector<float> HEXxNegDirnMeclErrBalnRate;
-  std::vector<float> HEXyPosDirnMeclErrBalnRate;
-  std::vector<float> HEXyNegDirnMeclErrBalnRate;
-  std::vector<float> HEXzPosDirnMeclErrBalnRate;
-  std::vector<float> HEXzNegDirnMeclErrBalnRate;
+  std::vector<float> HEXxPosDirnMeclErrBalnRate1st;
+  std::vector<float> HEXxNegDirnMeclErrBalnRate1st;
+  std::vector<float> HEXyPosDirnMeclErrBalnRate1st;
+  std::vector<float> HEXyNegDirnMeclErrBalnRate1st;
+  std::vector<float> HEXzPosDirnMeclErrBalnRate1st;
+  std::vector<float> HEXzNegDirnMeclErrBalnRate1st;
 
-  std::vector<float> CRABxPosDirnMeclErrBalnRate;
-  std::vector<float> CRABxNegDirnMeclErrBalnRate;
-  std::vector<float> CRAByPosDirnMeclErrBalnRate;
-  std::vector<float> CRAByNegDirnMeclErrBalnRate;
-  std::vector<float> CRABzPosDirnMeclErrBalnRate;
-  std::vector<float> CRABzNegDirnMeclErrBalnRate;
+  std::vector<float> HEXxPosDirnMeclErrBalnRate2nd;
+  std::vector<float> HEXxNegDirnMeclErrBalnRate2nd;
+  std::vector<float> HEXyPosDirnMeclErrBalnRate2nd;
+  std::vector<float> HEXyNegDirnMeclErrBalnRate2nd;
+  std::vector<float> HEXzPosDirnMeclErrBalnRate2nd;
+  std::vector<float> HEXzNegDirnMeclErrBalnRate2nd;
+  
+
+  std::vector<float> CRABxPosDirnMeclErrBalnRate1st;
+  std::vector<float> CRABxNegDirnMeclErrBalnRate1st;
+  std::vector<float> CRAByPosDirnMeclErrBalnRate1st;
+  std::vector<float> CRAByNegDirnMeclErrBalnRate1st;
+  std::vector<float> CRABzPosDirnMeclErrBalnRate1st;
+  std::vector<float> CRABzNegDirnMeclErrBalnRate1st;
+
+  std::vector<float> CRABxPosDirnMeclErrBalnRate2nd;
+  std::vector<float> CRABxNegDirnMeclErrBalnRate2nd;
+  std::vector<float> CRAByPosDirnMeclErrBalnRate2nd;
+  std::vector<float> CRAByNegDirnMeclErrBalnRate2nd;
+  std::vector<float> CRABzPosDirnMeclErrBalnRate2nd;
+  std::vector<float> CRABzNegDirnMeclErrBalnRate2nd;
 
 
   void walkGaitMeclErrCompensate(hexapod_msgs::LegsJoints &legs, std::vector<float> &MeclErrBalnRate, const int cycle_period, const int cycle_length);
@@ -169,17 +184,21 @@ private:
 
   std::vector< std::vector<float> > hex2crabMeclErrBalnRate;
   std::vector<float> hex2crabMeclErrBalnRateLeg1;
+  std::vector<float> hex2crabMeclErrBalnRateLeg2;
   std::vector<float> hex2crabMeclErrBalnRateLeg3;
   std::vector<float> hex2crabMeclErrBalnRateLeg4;
+  std::vector<float> hex2crabMeclErrBalnRateLeg5;
   std::vector<float> hex2crabMeclErrBalnRateLeg6;
 
   std::vector< std::vector<float> > crab2hexMeclErrBalnRate;
   std::vector<float> crab2hexMeclErrBalnRateLeg1;
+  std::vector<float> crab2hexMeclErrBalnRateLeg2;
   std::vector<float> crab2hexMeclErrBalnRateLeg3;
   std::vector<float> crab2hexMeclErrBalnRateLeg4;
+  std::vector<float> crab2hexMeclErrBalnRateLeg5;
   std::vector<float> crab2hexMeclErrBalnRateLeg6;
   
-  void modeTransmPrePress(const int MODE, const int modeTransmStep, const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs);
+  void modeTransmPrePress(const int MODE, const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs);
   void publishModeTransmPrePressPos();
   bool modeTransmPrePressFeedDrivers();
 };

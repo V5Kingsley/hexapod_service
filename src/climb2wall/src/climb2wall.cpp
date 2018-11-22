@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 
   Solution.legAdjustOnGround(3, initPos[3], finalPos[3], liftHeight, cycle_length, legs);
   //四腿预压///
-  prePress = 0.015;
+  prePress = 0.020;
   //Solution.cyclePosPrePress(3, prePress, prePress_cycle, legs);
   Solution.prePress(3, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 
   Solution.legAdjustOnGround(5, initPos[5], finalPos[5], liftHeight, cycle_length, legs);
   //六腿预压///
-  prePress = 0.015;
+  prePress = 0.020;
   //Solution.cyclePosPrePress(5, prePress, prePress_cycle, legs);
   Solution.prePress(5, prePress, prePress_cycle, legs);
   Solution.meclErrRecover(meclErrRecover_cycle, legs);
@@ -99,6 +99,7 @@ int main(int argc, char **argv)
   double givenPosZ = 0.24;                                                 //抬腿高度，相对于六足坐标系
   Solution.leftLeg2WallFinalPos(1, distance2Wall, givenPosZ, finalPos[1]); //腿上墙后的终止姿态
   Solution.leftLeg2Wall(1, initPos[1], finalPos[1], legs, cycle_length);   //腿上墙控制函数
+  Solution.keepMeclErr(legs);   //让legs的角度保持当前的误差去计算下一步姿态
   Solution.stepCnt++;
 
   /*****************前移****************************/ //stepCnt = 6 
@@ -107,7 +108,7 @@ int main(int argc, char **argv)
   height = 0.0;
   Solution.publishRollTranslationLiftBut2(GROUND, roll_t, roll_0, translation, height, legs, cycle_length);
   //Solution.meclErrRecover(meclErrRecover_cycle, legs);
-  Solution.keepMeclErr(legs);   //让legs的角度保持当前的误差去计算下一步姿态
+  //Solution.keepMeclErr(legs);   //让legs的角度保持当前的误差去计算下一步姿态
   Solution.stepCnt++; 
 
   /*********************前移后提升重心********************************/ //stepCnt = 7 //此步骤不修复误差，误差比例全置0
@@ -118,11 +119,11 @@ int main(int argc, char **argv)
 
   //二腿预压///
   prePress = 0.015;
-  Solution.stepCnt--;   //legs的角度恢复上一步保持的误差值
+  Solution.stepCnt-=2;   //legs的角度恢复上一步保持的误差值
   Solution.resetMeclErr(legs);   //legs的角度恢复上一步保持的误差值
   Solution.leg2SpecialPrePress(1, prePress, roll_t, prePress_cycle, legs);  //二腿预压特殊处理，修正了抬腿时预留的0.02距离
   Solution.meclErrRecover(meclErrRecover_cycle, legs);  //此处的误差回复的是上一步的误差
-  Solution.stepCnt+=2;   //stepCnt恢复
+  Solution.stepCnt+=3;   //stepCnt恢复
 
   /******************抬第一腿************************/  //stepCnt = 8
   cycle_length = 3500; 
@@ -350,6 +351,7 @@ int main(int argc, char **argv)
   Solution.publishRollTranslationLift(GROUND, roll_t, roll_0, translation, height, legs, cycle_length);
   Solution.stepCnt++;
 
+#if 0
   /**********************还原六足初始姿态******************************/  //stepCnt = 29
   cycle_length = 2800; //2800
   //初始姿态
@@ -382,10 +384,13 @@ int main(int argc, char **argv)
 
   for (int leg_index = 0; leg_index < 6; leg_index++)
   {
+    if(leg_index > 3)
+      prePress = 0.025;
     Solution.legAdjustOnGround(leg_index, initPos[leg_index], finalPos[leg_index], liftHeight, cycle_length, legs);
     //Solution.cyclePosPrePress(leg_index, prePress, prePress_cycle, legs); //预压
     Solution.prePress(leg_index, prePress, prePress_cycle, legs);
     Solution.meclErrRecover(meclErrRecover_cycle, legs);
     Solution.stepCnt++;
   }
+#endif
 }

@@ -961,7 +961,7 @@ void Solution::publishSmoothPos(const int leg_index)
       leg_tarsus_p[leg].publish(leg_tarsus[leg]);
     }
 
-    ros::Duration(0.005).sleep();
+    ros::Duration(0.0005).sleep();
   }
 #endif
 
@@ -994,7 +994,7 @@ void Solution::publishPrePressPos()
       leg_tarsus_p[leg].publish(leg_tarsus[leg]);
     }
 
-    ros::Duration(0.005).sleep();
+    ros::Duration(0.0005).sleep();
   }
 #endif
 
@@ -1591,7 +1591,7 @@ void Solution::publishMeclErrRecover()
       leg_tarsus_p[leg].publish(leg_tarsus[leg]);
     }
 
-    ros::Duration(0.005).sleep();
+    ros::Duration(0.0005).sleep();
   }
 #endif
 

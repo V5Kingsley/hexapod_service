@@ -22,8 +22,8 @@
 #include <link_com/hexcom.h>
 #include <link_com/heartbag.h>
 
-#define MACHINE 0   //仿真和实体机标志位。置0时为gazebo仿真，置1时为实体机（发送角度控制给服务器）
-#define STICK 1 //吸盘控制。置0时取消，置1开启
+#define MACHINE 1   //仿真和实体机标志位。置0时为gazebo仿真，置1时为实体机（发送角度控制给服务器）
+#define STICK 0 //吸盘控制。置0时取消，置1开启
 
 class Control
 {

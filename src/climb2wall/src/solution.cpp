@@ -22,12 +22,14 @@ Solution::Solution(const std::string name, bool spin_thread) : hexapodClient(nam
   /**机械误差补偿**/
   ros::param::get("JOINT_MECHANICAL_ERROR", MeclErr);          //机械误差
   ros::param::get("JOINT_MECHANICAL_ERROR_UNIT", MeclErrUnit); //机械误差单位
+  ros::param::get("MECLERR_BALANCE_LENGTH", meclErr_balance_length);
   //获取24个电机的机械误差值
   for (int i = 0; i < 24; i++)
   {
     vector<float> oneRate;
     ros::param::get(("JOINT" + std::to_string(i + 1) + "_MECHANICAL_ERROR_BALANCE_RATE"), oneRate);
     MeclErrBalnRate.push_back(oneRate);
+    MeclErrBalnRate_forSave.push_back(oneRate);
   }
   stepNUM = MeclErrBalnRate[0].size();
 
@@ -84,6 +86,29 @@ Solution::Solution(const std::string name, bool spin_thread) : hexapodClient(nam
 
   stickClient = nh_.serviceClient<link_com::hexcom>("hexapod_st_service");                                       //吸盘服务器
   heartbagSub = nh_.subscribe<link_com::heartbag>("/hexapod_st_heartbag", 1, &Solution::heartbagCallBack, this); //心跳包订阅者
+
+  //预压前的角度误差
+  leg_meclErr_balance_sub = nh_.subscribe<hexapod_msgs::LegJoints>("/hexapod_meclErr_balance", 1, &Solution::leg_meclErr_balance_cb, this);
+  leg_prePress_confirm_sub = nh_.subscribe<std_msgs::Float64>("/hexapod_confirm_prePress", 1, &Solution::leg_prePress_confirm_cb, this);
+  leg_meclErr_flag = false;
+  prePress_confirm_flag = false;
+
+  //预压后的角度误差
+  meclErr_afterPrePress_sub = nh_.subscribe<hexapod_msgs::LegJoints>("/hexapod_completely_prePress_balance", 1, &Solution::meclErr_afterPrePress_cb, this);
+  leg_meclErr_afterPrePress_flag = false;
+
+  ROS_INFO("*********************************");
+  ROS_INFO("         WeLCH-CLIMBING          ");
+  if(MACHINE == 1)
+    ROS_INFO(" Machine/Simulation: Machine    ");
+  else
+    ROS_INFO(" Machine/Simulation: Simulation ");
+  if(STICK ==1 )
+    ROS_INFO("      Stick Control: ON         ");
+  else
+    ROS_INFO("      Stick Control: OFF        ");
+  ROS_INFO("          by Kingsley             ");
+  ROS_INFO("**********************************");
 }
 
 /******************************************************
@@ -209,7 +234,7 @@ void Solution::legAdjustOnGround(const int leg_index, const geometry_msgs::Point
   {
     interpolationOnGround(initPos, finalPos, liftHeight, i, cycle_length, pos); //初始位姿和终止位姿间插值
     jointCalculate(GROUND, leg_index, pos, 0, legs.leg[leg_index]);             //用插值后的位姿进行角度计算
-    rawJointStatesStore(legs);                                                   //将角度存至posBuffer缓存
+    rawJointStatesStore(legs);                                                  //将角度存至posBuffer缓存
     if (i <= 1.0 / 3.0 * cycle_length || i >= 2.0 / 3.0 * cycle_length)
       i += 2.0;
     else
@@ -393,7 +418,7 @@ void Solution::leftLeg2Wall(const int leg_index, const geometry_msgs::Point &ini
   {
     interpLeg2Wall(leg_index, initPos, finalPos, i, cycle_length, pos, beta);      //左腿上墙对位姿和beta插值
     leftLeg2WallJointCalculate(leg_index, pos, beta, roll_t, legs.leg[leg_index]); //根据插值结果计算关节角
-    rawJointStatesStore(legs);                                                      
+    rawJointStatesStore(legs);
     if (leg_index == 1)
     {
       if (i >= 1.0 / 2.0 * cycle_length && i <= 3.0 / 5.0 * cycle_length)
@@ -498,7 +523,7 @@ void Solution::rightLegStride(const int leg_index, const double &stride, const d
   {
     rightLegStrideInter(leg_index, stride, liftHeight, initPos, roll_t, i, cycle_length, pos); //插值位姿函数
     jointCalculate(WALL, leg_index, pos, roll_t, legs.leg[leg_index]);                         //根据插值位姿计算关节角
-    rawJointStatesStore(legs);                                                    
+    rawJointStatesStore(legs);
   }
   posMeanFilter();
   publishSmoothPos(leg_index);
@@ -677,10 +702,8 @@ void Solution::rightLeg2Wall(const int leg_index, const geometry_msgs::Point &in
 *         输入： 腿序  预压距离  预压周期  关节角度        *
 *                                                    *
 *****************************************************/
-void Solution::prePress(const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
+/*void Solution::prePress(const int leg_index, double prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
 {
-  hexapod_msgs::LegJoints initLeg; //缓存初始关节角
-
   for (int i = 0; i < 6; i++)
   {
     legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErrBalnRate[i * 4][stepCnt] * MeclErr[i * 4];
@@ -688,6 +711,23 @@ void Solution::prePress(const int leg_index, const double &prePress, const int &
     legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErrBalnRate[i * 4 + 2][stepCnt] * MeclErr[i * 4 + 2];
     legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErrBalnRate[i * 4 + 3][stepCnt] * MeclErr[i * 4 + 3];
   }
+
+  //预压前确定角度补偿
+  prePress_confirm_flag = false;
+  ROS_INFO("Please publish '/hexapod_confirm_prePress' topic to confirm prePress.");
+  ROS_INFO("Before prePress confirm, you can publish '/hexapod_meclErr_balance' topic to correct the mechanical error");
+  while (prePress_confirm_flag == false)
+  {
+    if (leg_meclErr_flag == true)
+    {
+      meclErr_balance(leg_index, legs);
+      leg_meclErr_flag = false;
+    }
+  }
+  prePress = prePress_confirm;
+  ROS_INFO("Ready to prepress. Prepress length: %fm", prePress);
+
+  hexapod_msgs::LegJoints initLeg; //缓存初始关节角
 
   initLeg.coxa = legs.leg[leg_index].coxa;
   initLeg.femur = legs.leg[leg_index].femur;
@@ -730,16 +770,11 @@ void Solution::prePress(const int leg_index, const double &prePress, const int &
     rawJointStatesStore(legs);
   }
   //  posMeanFilter();
-  publishPrePressPos();
-}
+  publishPrePressPos(leg_index, legs);
+} */
 
-
-//二腿预压特殊处理，修正了抬腿时预留的0.02距离
-void Solution::leg2SpecialPrePress(const int leg_index, const double &prePress, const double &roll, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
+void Solution::prePress(const int leg_index, double prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
 {
-
-  hexapod_msgs::LegJoints initLeg; //缓存初始关节角
-
   for (int i = 0; i < 6; i++)
   {
     legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErrBalnRate[i * 4][stepCnt] * MeclErr[i * 4];
@@ -747,6 +782,219 @@ void Solution::leg2SpecialPrePress(const int leg_index, const double &prePress, 
     legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErrBalnRate[i * 4 + 2][stepCnt] * MeclErr[i * 4 + 2];
     legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErrBalnRate[i * 4 + 3][stepCnt] * MeclErr[i * 4 + 3];
   }
+
+  //预压前确定角度补偿
+  prePress_confirm_flag = false;
+  ROS_INFO("Please publish '/hexapod_confirm_prePress' topic to confirm prePress.");
+  ROS_INFO("Before prePress confirm, you can publish '/hexapod_meclErr_balance' topic to correct the mechanical error");
+  leg_meclErr_flag = false; 
+  leg_meclErr_balance.coxa = leg_meclErr_balance.femur = leg_meclErr_balance.tibia = leg_meclErr_balance.tarsus = 0.0;
+  while (prePress_confirm_flag == false)
+  {
+    if (leg_meclErr_flag == true)
+    {
+      meclErr_balance(leg_index, legs);
+      leg_meclErr_flag = false;
+    }
+  }
+  prePress = prePress_confirm;
+  ROS_INFO("Ready to prepress. Prepress length: %fm", prePress);
+
+  prePress_forward(leg_index, prePress, cycle_length / 2, legs);
+
+  prePress_backward(leg_index, prePress, cycle_length / 2, legs);
+}
+
+void Solution::prePress_forward(const int leg_index, double prePress, const int cycle_length, hexapod_msgs::LegsJoints &legs)
+{
+  hexapod_msgs::LegJoints initLeg; //缓存初始关节角
+
+  initLeg.coxa = legs.leg[leg_index].coxa;
+  initLeg.femur = legs.leg[leg_index].femur;
+  initLeg.tibia = legs.leg[leg_index].tibia;
+  initLeg.tarsus = legs.leg[leg_index].tarsus;
+
+  for (int cycle_period = 0; cycle_period <= cycle_length; cycle_period++)
+  {
+    double interFuncX = -0.5 * cos(M_PI * cycle_period / cycle_length) + 0.5;
+    double foot2foot_x = prePress * interFuncX;
+
+    double foot2foot_y = 0;
+
+    double A = FEMUR_LENGTH * sin(initLeg.tibia + initLeg.tarsus) + TIBIA_LENGTH * cos(initLeg.tarsus) + foot2foot_x;
+    double B = FEMUR_LENGTH * cos(initLeg.tibia + initLeg.tarsus) - TIBIA_LENGTH * sin(initLeg.tarsus) + foot2foot_y;
+    double C = FEMUR_LENGTH;
+    double D = TIBIA_LENGTH;
+
+    double temp = 4.0 * pow(C, 2) * pow(D, 2) - pow((A * A + B * B - C * C - D * D), 2);
+    temp = temp > 0 ? temp : 0;
+
+    double x = 2.0 * atan(
+                         (2.0 * A * C - sqrt(temp)) /
+                         (A * A + pow((B + C), 2) - D * D));
+
+    double y = 2.0 * atan(
+                         (-2.0 * B * D + sqrt(temp)) /
+                         (pow((A + D), 2) + B * B - C * C));
+
+    legs.leg[leg_index].coxa = initLeg.coxa;
+    legs.leg[leg_index].femur = initLeg.femur + initLeg.tarsus + initLeg.tibia - x;
+    legs.leg[leg_index].tibia = x - y;
+    legs.leg[leg_index].tarsus = y;
+
+    rawJointStatesStore(legs);
+  }
+
+  ROS_INFO("---prepress stick control---");
+
+#if MACHINE
+  maxpointsRequest(); //请求maxpoints，确认freeSpace/motionActive
+
+  while (freeSpace < (sm_point_buf_size - 30)) //sm服务器buffer接近空时，进行吸盘控制
+  {
+    ros::Duration(2).sleep();
+    maxpointsRequest();
+  }
+
+  if (!motionActive)
+  {
+    ROS_FATAL("Motion not active!");
+    ros::shutdown();
+    //return false;
+  }
+#endif
+
+#if STICK
+  //预压前发送io口控制，将所有吸盘均吸至真空
+  stickSrv.request.chose = 2;
+  int requestIO[7];
+  for (int i = 0; i < 6; i++)
+  {
+    stickSrv.request.io[i] = 0;
+    requestIO[i] = 0;
+  }
+  stickSrv.request.io[6] = requestIO[6] = 1;
+
+  while (!stickClient.call(stickSrv))
+  {
+    ROS_WARN("Failed to call stick service. Retrying...");
+    ros::Duration(2).sleep();
+  }
+  ROS_INFO("%s, request io: %d, %d, %d, %d, %d, %d", stickSrv.response.back.c_str(), requestIO[0], requestIO[1], requestIO[2], requestIO[3], requestIO[4], requestIO[5]);
+#endif
+
+  publishPosBuffer(); //发送io口控制后进行预压
+
+#if STICK
+  ros::Duration(5.0).sleep(); //确保气压从80以上降到80以下再回升
+  //查看吸盘是否吸气完成
+
+  hexapod_msgs::LegsJoints initLegs; //缓存初始关节角度
+  for (int leg_index = 0; leg_index < 6; leg_index++)
+  {
+    initLegs.leg[leg_index].coxa = legs.leg[leg_index].coxa;
+    initLegs.leg[leg_index].femur = legs.leg[leg_index].femur;
+    initLegs.leg[leg_index].tibia = legs.leg[leg_index].tibia;
+    initLegs.leg[leg_index].tarsus = legs.leg[leg_index].tarsus;
+  }
+  bool leg_meclErr_reset_flag = false;
+
+  leg_meclErr_afterPrePress_flag = false;
+  leg_meclErr_afterPrePress.coxa = leg_meclErr_afterPrePress.femur = leg_meclErr_afterPrePress.tibia = leg_meclErr_afterPrePress.tarsus = 0.0;
+  while (!isStickDone(requestIO))
+  {
+    if (leg_meclErr_afterPrePress_flag == true)
+    {
+      completely_prePress_balance(leg_index, legs);
+      leg_meclErr_afterPrePress_flag = false;
+      leg_meclErr_reset_flag = true;
+    }
+    else
+    {
+      ros::Duration(3).sleep();
+    }
+  }
+  if (leg_meclErr_reset_flag == true)
+  {
+    MeclErrBalnRate[leg_index * 4][stepCnt] += ((legs.leg[leg_index].coxa - initLegs.leg[leg_index].coxa) / MeclErrUnit / MeclErr[leg_index * 4]);
+    MeclErrBalnRate[leg_index * 4 + 1][stepCnt] += ((legs.leg[leg_index].femur - initLegs.leg[leg_index].femur) / MeclErrUnit / MeclErr[leg_index * 4 + 1]);
+    MeclErrBalnRate[leg_index * 4 + 2][stepCnt] += ((legs.leg[leg_index].tibia - initLegs.leg[leg_index].tibia) / MeclErrUnit / MeclErr[leg_index * 4 + 2]);
+    MeclErrBalnRate[leg_index * 4 + 3][stepCnt] += ((legs.leg[leg_index].tarsus - initLegs.leg[leg_index].tarsus) / MeclErrUnit / MeclErr[leg_index * 4 + 3]);
+  }
+
+  ROS_INFO("Prepress finished. ");
+#endif
+}
+
+void Solution::prePress_backward(const int leg_index, double prePress, const int cycle_length, hexapod_msgs::LegsJoints &legs)
+{
+  hexapod_msgs::LegJoints initLeg; //缓存初始关节角
+
+  initLeg.coxa = legs.leg[leg_index].coxa;
+  initLeg.femur = legs.leg[leg_index].femur;
+  initLeg.tibia = legs.leg[leg_index].tibia;
+  initLeg.tarsus = legs.leg[leg_index].tarsus;
+
+  for (int cycle_period = 0; cycle_period <= cycle_length; cycle_period++)
+  {
+    double interFuncX = 0.5 * cos(M_PI * cycle_period / cycle_length) - 0.5;
+    double foot2foot_x = prePress * interFuncX;
+
+    double foot2foot_y = 0;
+
+    double A = FEMUR_LENGTH * sin(initLeg.tibia + initLeg.tarsus) + TIBIA_LENGTH * cos(initLeg.tarsus) + foot2foot_x;
+    double B = FEMUR_LENGTH * cos(initLeg.tibia + initLeg.tarsus) - TIBIA_LENGTH * sin(initLeg.tarsus) + foot2foot_y;
+    double C = FEMUR_LENGTH;
+    double D = TIBIA_LENGTH;
+
+    double temp = 4.0 * pow(C, 2) * pow(D, 2) - pow((A * A + B * B - C * C - D * D), 2);
+    temp = temp > 0 ? temp : 0;
+
+    double x = 2.0 * atan(
+                         (2.0 * A * C - sqrt(temp)) /
+                         (A * A + pow((B + C), 2) - D * D));
+
+    double y = 2.0 * atan(
+                         (-2.0 * B * D + sqrt(temp)) /
+                         (pow((A + D), 2) + B * B - C * C));
+
+    legs.leg[leg_index].coxa = initLeg.coxa;
+    legs.leg[leg_index].femur = initLeg.femur + initLeg.tarsus + initLeg.tibia - x;
+    legs.leg[leg_index].tibia = x - y;
+    legs.leg[leg_index].tarsus = y;
+
+    rawJointStatesStore(legs);
+  }
+  publishPosBuffer();
+}
+
+//二腿预压特殊处理，修正了抬腿时预留的0.02距离
+/*void Solution::leg2SpecialPrePress(const int leg_index, double prePress, const double &roll, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
+{
+  for (int i = 0; i < 6; i++)
+  {
+    legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErrBalnRate[i * 4][stepCnt] * MeclErr[i * 4];
+    legs.leg[i].femur = legs.leg[i].femur + MeclErrUnit * MeclErrBalnRate[i * 4 + 1][stepCnt] * MeclErr[i * 4 + 1];
+    legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErrBalnRate[i * 4 + 2][stepCnt] * MeclErr[i * 4 + 2];
+    legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErrBalnRate[i * 4 + 3][stepCnt] * MeclErr[i * 4 + 3];
+  }
+
+  //预压前确定角度补偿
+  ROS_INFO("Please publish '/hexapod_confirm_prePress' topic to confirm prePress.");
+  ROS_INFO("Before prePress confirm, you can publish '/hexapod_meclErr_balance' topic to correct the mechanical error");
+  while (prePress_confirm_flag == false)
+  {
+    if (leg_meclErr_flag == true)
+    {
+      meclErr_balance(leg_index, legs);
+      leg_meclErr_flag = false;
+    }
+  }
+  prePress_confirm_flag = false;
+  prePress = prePress_confirm;
+  ROS_INFO("Ready to prepress. Prepress length: %fm", prePress);
+
+  hexapod_msgs::LegJoints initLeg; //缓存初始关节角
 
   initLeg.coxa = legs.leg[leg_index].coxa;
   initLeg.femur = legs.leg[leg_index].femur;
@@ -765,7 +1013,7 @@ void Solution::leg2SpecialPrePress(const int leg_index, const double &prePress, 
     if (cycle_period <= 0.5 * cycle_length)
     {
       interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) + 0.5;
-      foot2foot_x = (prePress + 0.02) * interFuncX;   //预压前半周期修正预留的0.02距离
+      foot2foot_x = (prePress + 0.02) * interFuncX; //预压前半周期修正预留的0.02距离
     }
     else
     {
@@ -777,7 +1025,7 @@ void Solution::leg2SpecialPrePress(const int leg_index, const double &prePress, 
         initLeg.tarsus = legs.leg[leg_index].tarsus;
         flag = false;
       }
-      interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) - 0.5;  //后半周期回复到0.58
+      interFuncX = -0.5 * cos(2.0 * M_PI * cycle_period / cycle_length) - 0.5; //后半周期回复到0.58
       foot2foot_x = prePress * interFuncX;
     }
 
@@ -811,7 +1059,160 @@ void Solution::leg2SpecialPrePress(const int leg_index, const double &prePress, 
     rawJointStatesStore(legs);
   }
   //  posMeanFilter();
-  publishPrePressPos();
+  publishPrePressPos(leg_index, legs);
+}*/
+
+//二腿预压特殊处理，修正了抬腿时预留的0.02距离
+void Solution::leg2SpecialPrePress(const int leg_index, double prePress, const double &roll, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
+{
+  for (int i = 0; i < 6; i++)
+  {
+    legs.leg[i].coxa = legs.leg[i].coxa + MeclErrUnit * MeclErrBalnRate[i * 4][stepCnt] * MeclErr[i * 4];
+    legs.leg[i].femur = legs.leg[i].femur + MeclErrUnit * MeclErrBalnRate[i * 4 + 1][stepCnt] * MeclErr[i * 4 + 1];
+    legs.leg[i].tibia = legs.leg[i].tibia + MeclErrUnit * MeclErrBalnRate[i * 4 + 2][stepCnt] * MeclErr[i * 4 + 2];
+    legs.leg[i].tarsus = legs.leg[i].tarsus + MeclErrUnit * MeclErrBalnRate[i * 4 + 3][stepCnt] * MeclErr[i * 4 + 3];
+  }
+
+  //预压前确定角度补偿
+  prePress_confirm_flag = false;
+  ROS_INFO("Please publish '/hexapod_confirm_prePress' topic to confirm prePress.");
+  ROS_INFO("Before prePress confirm, you can publish '/hexapod_meclErr_balance' topic to correct the mechanical error");
+  leg_meclErr_flag = false; 
+  leg_meclErr_balance.coxa = leg_meclErr_balance.femur = leg_meclErr_balance.tibia = leg_meclErr_balance.tarsus = 0.0;
+  while (prePress_confirm_flag == false)
+  {
+    if (leg_meclErr_flag == true)
+    {
+      meclErr_balance(leg_index, legs);
+      leg_meclErr_flag = false;
+    }
+  }
+  prePress = prePress_confirm;
+  ROS_INFO("Ready to prepress. Prepress length: %fm", prePress);
+
+  leg2Special_prePress_forward(leg_index, prePress, cycle_length / 2, legs);
+
+  prePress_backward(leg_index, prePress, cycle_length / 2, legs);
+}
+
+void Solution::leg2Special_prePress_forward(const int leg_index, double prePress, const int cycle_length, hexapod_msgs::LegsJoints &legs)
+{
+  hexapod_msgs::LegJoints initLeg; //缓存初始关节角
+
+  initLeg.coxa = legs.leg[leg_index].coxa;
+  initLeg.femur = legs.leg[leg_index].femur;
+  initLeg.tibia = legs.leg[leg_index].tibia;
+  initLeg.tarsus = legs.leg[leg_index].tarsus;
+
+  for (int cycle_period = 0; cycle_period <= cycle_length; cycle_period++)
+  {
+    double interFuncX = -0.5 * cos(M_PI * cycle_period / cycle_length) + 0.5;
+    double foot2foot_x = (prePress + 0.02) * interFuncX;
+
+    double foot2foot_y = 0;
+
+    double A = FEMUR_LENGTH * sin(initLeg.tibia + initLeg.tarsus) + TIBIA_LENGTH * cos(initLeg.tarsus) + foot2foot_x;
+    double B = FEMUR_LENGTH * cos(initLeg.tibia + initLeg.tarsus) - TIBIA_LENGTH * sin(initLeg.tarsus) + foot2foot_y;
+    double C = FEMUR_LENGTH;
+    double D = TIBIA_LENGTH;
+
+    double temp = 4.0 * pow(C, 2) * pow(D, 2) - pow((A * A + B * B - C * C - D * D), 2);
+    temp = temp > 0 ? temp : 0;
+
+    double x = 2.0 * atan(
+                         (2.0 * A * C - sqrt(temp)) /
+                         (A * A + pow((B + C), 2) - D * D));
+
+    double y = 2.0 * atan(
+                         (-2.0 * B * D + sqrt(temp)) /
+                         (pow((A + D), 2) + B * B - C * C));
+
+    legs.leg[leg_index].coxa = initLeg.coxa;
+    legs.leg[leg_index].femur = initLeg.femur + initLeg.tarsus + initLeg.tibia - x;
+    legs.leg[leg_index].tibia = x - y;
+    legs.leg[leg_index].tarsus = y;
+
+    rawJointStatesStore(legs);
+  }
+
+  ROS_INFO("---prepress stick control---");
+
+#if MACHINE
+  maxpointsRequest(); //请求maxpoints，确认freeSpace/motionActive
+
+  while (freeSpace < (sm_point_buf_size - 30)) //sm服务器buffer接近空时，进行吸盘控制
+  {
+    ros::Duration(2).sleep();
+    maxpointsRequest();
+  }
+
+  if (!motionActive)
+  {
+    ROS_FATAL("Motion not active!");
+    ros::shutdown();
+    //return false;
+  }
+#endif
+
+#if STICK
+  //预压前发送io口控制，将所有吸盘均吸至真空
+  stickSrv.request.chose = 2;
+  int requestIO[7];
+  for (int i = 0; i < 6; i++)
+  {
+    stickSrv.request.io[i] = 0;
+    requestIO[i] = 0;
+  }
+  stickSrv.request.io[6] = requestIO[6] = 1;
+
+  while (!stickClient.call(stickSrv))
+  {
+    ROS_WARN("Failed to call stick service. Retrying...");
+    ros::Duration(2).sleep();
+  }
+  ROS_INFO("%s, request io: %d, %d, %d, %d, %d, %d", stickSrv.response.back.c_str(), requestIO[0], requestIO[1], requestIO[2], requestIO[3], requestIO[4], requestIO[5]);
+#endif
+
+  publishPosBuffer(); //发送io口控制后进行预压
+
+#if STICK
+  ros::Duration(5.0).sleep(); //确保气压从80以上降到80以下再回升
+  //查看吸盘是否吸气完成
+
+  hexapod_msgs::LegsJoints initLegs; //缓存初始关节角度
+  for (int leg_index = 0; leg_index < 6; leg_index++)
+  {
+    initLegs.leg[leg_index].coxa = legs.leg[leg_index].coxa;
+    initLegs.leg[leg_index].femur = legs.leg[leg_index].femur;
+    initLegs.leg[leg_index].tibia = legs.leg[leg_index].tibia;
+    initLegs.leg[leg_index].tarsus = legs.leg[leg_index].tarsus;
+  }
+  bool leg_meclErr_reset_flag = false;
+  leg_meclErr_afterPrePress_flag = false;
+  leg_meclErr_afterPrePress.coxa = leg_meclErr_afterPrePress.femur = leg_meclErr_afterPrePress.tibia = leg_meclErr_afterPrePress.tarsus = 0.0;
+  while (!isStickDone(requestIO))
+  {
+    if (leg_meclErr_afterPrePress_flag == true)
+    {
+      completely_prePress_balance(leg_index, legs);
+      leg_meclErr_afterPrePress_flag = false;
+      leg_meclErr_reset_flag = true;
+    }
+    else
+    {
+      ros::Duration(3).sleep();
+    }
+  }
+  if (leg_meclErr_reset_flag == true)
+  {
+    MeclErrBalnRate[leg_index * 4][stepCnt] += ((legs.leg[leg_index].coxa - initLegs.leg[leg_index].coxa) / MeclErrUnit / MeclErr[leg_index * 4]);
+    MeclErrBalnRate[leg_index * 4 + 1][stepCnt] += ((legs.leg[leg_index].femur - initLegs.leg[leg_index].femur) / MeclErrUnit / MeclErr[leg_index * 4 + 1]);
+    MeclErrBalnRate[leg_index * 4 + 2][stepCnt] += ((legs.leg[leg_index].tibia - initLegs.leg[leg_index].tibia) / MeclErrUnit / MeclErr[leg_index * 4 + 2]);
+    MeclErrBalnRate[leg_index * 4 + 3][stepCnt] += ((legs.leg[leg_index].tarsus - initLegs.leg[leg_index].tarsus) / MeclErrUnit / MeclErr[leg_index * 4 + 3]);
+  }
+
+  ROS_INFO("Prepress finished. ");
+#endif
 }
 
 /*********************************************
@@ -819,7 +1220,7 @@ void Solution::leg2SpecialPrePress(const int leg_index, const double &prePress, 
 *      输入： 腿序、预压距离、周期长度、关节角度    *
 *                                            *
 **********************************************/
-void Solution::cyclePosPrePress(const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
+/*void Solution::cyclePosPrePress(const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs)
 {
   hexapod_msgs::LegJoints initLeg; //缓存初始关节角
 
@@ -865,11 +1266,11 @@ void Solution::cyclePosPrePress(const int leg_index, const double &prePress, con
 
     // legSafeControl(legs.leg[leg_index]);
 
-    rawJointStatesStore(legs);  //将角度存至posBuffer
+    rawJointStatesStore(legs); //将角度存至posBuffer
   }
   //  posMeanFilter();
-  publishPrePressPos();  //预压不需角度平滑，直接执行posBuffer中的角度
-}
+  publishPrePressPos(leg_index, legs); //预压不需角度平滑，直接执行posBuffer中的角度
+}*/
 
 /***********************************************
  *                %角度平滑函数%                 *
@@ -936,44 +1337,18 @@ double Solution::meanCalculate(const int bufferIndex, const int i, const int k)
   return result;
 }
 
-
-
 //将smoothPosBuffer中的角度发至gazebo话题或六足服务器
 //输入腿序，用于吸盘控制。腿序为0-5代表相应的吸盘放气，腿序为6代表所有的吸盘均吸气
 void Solution::publishSmoothPos(const int leg_index)
 {
-#if !MACHINE //将smoothPosBuffer中的角度缓存发布角度话题，用于gazebo仿真
-  for (int i = 0; i < smoothPosBuffer[0].size(); i++)
-  {
-    for (int leg = 0; leg < 6; leg++)
-    {
-      leg_coxa[leg].data = smoothPosBuffer[leg * 4][i];
-      leg_femur[leg].data = smoothPosBuffer[leg * 4 + 1][i];
-      leg_tibia[leg].data = smoothPosBuffer[leg * 4 + 2][i];
-      leg_tarsus[leg].data = smoothPosBuffer[leg * 4 + 3][i];
-    }
 
-    for (int leg = 0; leg < 6; leg++)
-    {
-      leg_coxa_p[leg].publish(leg_coxa[leg]);
-      leg_femur_p[leg].publish(leg_femur[leg]);
-      leg_tibia_p[leg].publish(leg_tibia[leg]);
-      leg_tarsus_p[leg].publish(leg_tarsus[leg]);
-    }
-
-    ros::Duration(0.0005).sleep();
-  }
-#endif
-
-#if MACHINE //将角度缓存发至六足服务器
+  //将角度缓存发至六足服务器
   if (feedDrviers(leg_index) != true)
     ros::shutdown();
-#endif
 }
 
-
 //发布posBuffer缓存中的预压角度至gazebo话题或六足服务器
-void Solution::publishPrePressPos()
+/*void Solution::publishPrePressPos(const int leg_index, hexapod_msgs::LegsJoints &legs)
 {
 #if !MACHINE
   for (int i = 0; i < posBuffer[0].size(); i++)
@@ -994,20 +1369,18 @@ void Solution::publishPrePressPos()
       leg_tarsus_p[leg].publish(leg_tarsus[leg]);
     }
 
-    ros::Duration(0.0005).sleep();
+    ros::Duration(0.005).sleep();
   }
 #endif
 
-#if MACHINE
-  if (prePressFeedDrviers() != true)
+  if (prePressFeedDrviers(leg_index, legs) != true)
     ros::shutdown();
-#endif
 
   for (int i = 0; i < 24; i++)
   {
     posBuffer[i].clear(); //清空缓存
   }
-}
+}*/
 
 /*******************************************************
  *       %将smoothPosBuffer缓存角度发至六足服务器%         *
@@ -1015,6 +1388,7 @@ void Solution::publishPrePressPos()
  * *****************************************************/
 bool Solution::feedDrviers(const int leg_index)
 {
+#if MACHINE
   maxpointsRequest(); //请求maxpoints，确认freeSpace/motionActive/bufferFree
 
   while (freeSpace < (sm_point_buf_size - 30)) //sm服务器buffer接近空时，进行吸盘控制
@@ -1029,17 +1403,19 @@ bool Solution::feedDrviers(const int leg_index)
     ros::shutdown();
     return false;
   }
+#endif
 
-  //ros::Duration(2).sleep();
-
+#if STICK
   stickControl(leg_index); //吸盘控制
+#endif
 
+#if MACHINE
   if (legControlHalf() != true) //发送smoothPosBuffer前半个周期给服务器
     return false;
 
   maxpointsRequest();
 
-  while (!bufferFree)   //当六组服务器buffer大小足以接收smoothPosBuffer一半的缓存时，继续发送剩下的半个周期
+  while (!bufferFree) //当六组服务器buffer大小足以接收smoothPosBuffer一半的缓存时，继续发送剩下的半个周期
   {
     ros::Duration(3).sleep();
     maxpointsRequest();
@@ -1054,17 +1430,40 @@ bool Solution::feedDrviers(const int leg_index)
 
   if (legControlRest() != true) //发送smoothPosBuffer后半个周期给服务器
     return false;
+#else
+  //将smoothPosBuffer中的角度缓存发布角度话题，用于gazebo仿真
+  for (int i = 0; i < smoothPosBuffer[0].size(); i++)
+  {
+    for (int leg = 0; leg < 6; leg++)
+    {
+      leg_coxa[leg].data = smoothPosBuffer[leg * 4][i];
+      leg_femur[leg].data = smoothPosBuffer[leg * 4 + 1][i];
+      leg_tibia[leg].data = smoothPosBuffer[leg * 4 + 2][i];
+      leg_tarsus[leg].data = smoothPosBuffer[leg * 4 + 3][i];
+    }
+
+    for (int leg = 0; leg < 6; leg++)
+    {
+      leg_coxa_p[leg].publish(leg_coxa[leg]);
+      leg_femur_p[leg].publish(leg_femur[leg]);
+      leg_tibia_p[leg].publish(leg_tibia[leg]);
+      leg_tarsus_p[leg].publish(leg_tarsus[leg]);
+    }
+
+    ros::Duration(0.005).sleep();
+  }
+#endif
 
   return true;
 }
 
-
 //将posBuffer中的预压角度发至六足服务器
-bool Solution::prePressFeedDrviers()
+bool Solution::prePressFeedDrviers(const int leg_index, hexapod_msgs::LegsJoints &legs)
 {
   ROS_INFO("-----Prepress-----");
 
-  maxpointsRequest();  //请求maxpoints，确认freeSpace/motionActive
+#if MACHINE
+  maxpointsRequest(); //请求maxpoints，确认freeSpace/motionActive
 
   while (freeSpace < (sm_point_buf_size - 30)) //sm服务器buffer接近空时，进行吸盘控制
   {
@@ -1078,7 +1477,9 @@ bool Solution::prePressFeedDrviers()
     ros::shutdown();
     return false;
   }
+#endif
 
+#if STICK
   //预压前发送io口控制，将所有吸盘均吸至真空
   stickSrv.request.chose = 2;
   int requestIO[7];
@@ -1095,7 +1496,9 @@ bool Solution::prePressFeedDrviers()
     ros::Duration(2).sleep();
   }
   ROS_INFO("%s, request io: %d, %d, %d, %d, %d, %d", stickSrv.response.back.c_str(), requestIO[0], requestIO[1], requestIO[2], requestIO[3], requestIO[4], requestIO[5]);
+#endif
 
+#if MACHINE
   if (posBufferLegControlHalf() != true) //发送前半个周期给服务器
     return false;
 
@@ -1105,17 +1508,47 @@ bool Solution::prePressFeedDrviers()
     ros::shutdown();
     return false;
   }
+#endif
 
+#if STICK
   ros::Duration(5.0).sleep(); //确保气压从80以上降到80以下再回升
   //查看吸盘是否吸气完成
+
+  hexapod_msgs::LegsJoints initLegs; //缓存初始关节角度
+  for (int leg_index = 0; leg_index < 6; leg_index++)
+  {
+    initLegs.leg[leg_index].coxa = legs.leg[leg_index].coxa;
+    initLegs.leg[leg_index].femur = legs.leg[leg_index].femur;
+    initLegs.leg[leg_index].tibia = legs.leg[leg_index].tibia;
+    initLegs.leg[leg_index].tarsus = legs.leg[leg_index].tarsus;
+  }
+  bool leg_meclErr_reset_flag = false;
   while (!isStickDone(requestIO))
   {
-    ros::Duration(3).sleep();
+    if (leg_meclErr_afterPrePress_flag == true)
+    {
+      completely_prePress_balance(leg_index, legs);
+      leg_meclErr_afterPrePress_flag = false;
+      leg_meclErr_reset_flag = true;
+    }
+    else
+    {
+      ros::Duration(3).sleep();
+    }
   }
-  ROS_INFO("Prepress finished. ");
+  if (leg_meclErr_reset_flag == true)
+  {
+    int reset_length = 400;
+    reset_prePress_balance(leg_index, reset_length, legs, initLegs);
+  }
 
+  ROS_INFO("Prepress finished. ");
+#endif
+
+#if MACHINE
   if (posBufferLegControlRest() != true) //发送后半个周期给服务器
     return false;
+#endif
 
   return true;
 }
@@ -1191,8 +1624,6 @@ void Solution::maxpoint_doneCb(const actionlib::SimpleClientGoalState &state, co
   }
 }
 
-
-
 //将smoothPosBuffer缓存的前半部分发送至服务器
 bool Solution::legControlHalf()
 {
@@ -1247,7 +1678,6 @@ bool Solution::legControlHalf()
   }
   return true;
 }
-
 
 //将smoothPosBuffer缓存的后半部分发至六足服务器
 bool Solution::legControlRest()
@@ -1513,7 +1943,7 @@ void Solution::stickControl(const int leg_index)
       }
     }
   }
-  stickSrv.request.io[6] = requestIO[6] = 1;   //空闲位，0/1均可
+  stickSrv.request.io[6] = requestIO[6] = 1; //空闲位，0/1均可
 
   while (!stickClient.call(stickSrv))
   {
@@ -1535,7 +1965,6 @@ void Solution::stickControl(const int leg_index)
   ROS_INFO("Hexapod is ready to move.");
 }
 
-
 /************机械误差恢复****************/
 void Solution::meclErrRecover(const int &cycle_length, hexapod_msgs::LegsJoints &legs)
 {
@@ -1550,7 +1979,7 @@ void Solution::meclErrRecover(const int &cycle_length, hexapod_msgs::LegsJoints 
     initlegs.leg[leg_index].tarsus = legs.leg[leg_index].tarsus;
   }
 
-//用三角函数将角度从加入机械误差后的角度恢复至原始角度
+  //用三角函数将角度从加入机械误差后的角度恢复至原始角度
   for (int i = 0; i <= cycle_length; i++)
   {
     for (int leg_index = 0; leg_index < 6; leg_index++)
@@ -1563,14 +1992,13 @@ void Solution::meclErrRecover(const int &cycle_length, hexapod_msgs::LegsJoints 
 
       legs.leg[leg_index].tarsus = 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * MeclErrBalnRate[leg_index * 4 + 3][stepCnt] * cos(M_PI * i / cycle_length) + initlegs.leg[leg_index].tarsus - 0.5 * MeclErrUnit * MeclErr[leg_index * 4 + 3] * MeclErrBalnRate[leg_index * 4 + 3][stepCnt];
     }
-    rawJointStatesStore(legs);  //将角度缓存至posBuffer
+    rawJointStatesStore(legs); //将角度缓存至posBuffer
   }
-  publishMeclErrRecover();  //处理posBuffer缓存中的角度
+  publishPosBuffer(); //处理posBuffer缓存中的角度
 }
 
-
-//将posBuffer中缓存的误差恢复角度发至gazebo话题或六足服务器
-void Solution::publishMeclErrRecover()
+//将posBuffer中缓存的角度发至gazebo话题或六足服务器
+void Solution::publishPosBuffer()
 {
 #if !MACHINE
   for (int i = 0; i < posBuffer[0].size(); i++)
@@ -1591,12 +2019,12 @@ void Solution::publishMeclErrRecover()
       leg_tarsus_p[leg].publish(leg_tarsus[leg]);
     }
 
-    ros::Duration(0.0005).sleep();
+    ros::Duration(0.005).sleep();
   }
 #endif
 
 #if MACHINE
-  meclErrRecFeedDrivers();
+  posBufferFeedDrivers();
 #endif
 
   for (int i = 0; i < 24; i++)
@@ -1605,13 +2033,12 @@ void Solution::publishMeclErrRecover()
   }
 }
 
-
 //将posBuffer缓存的误差恢复角度发至六足服务器
-bool Solution::meclErrRecFeedDrivers()
+bool Solution::posBufferFeedDrivers()
 {
-  maxpointsRequest();  //请求maxpoints，确认freeSpace/motionActive
+  maxpointsRequest(); //请求maxpoints，确认freeSpace/motionActive
 
-  while (freeSpace < (sm_point_buf_size - 30))   //当六足服务器缓存接近空时再发送角度
+  while (freeSpace < (sm_point_buf_size - 30)) //当六足服务器缓存接近空时再发送角度
   {
     ros::Duration(3).sleep();
     maxpointsRequest();
@@ -1653,4 +2080,187 @@ void Solution::resetMeclErr(hexapod_msgs::LegsJoints &legs)
     legs.leg[leg_index].tibia -= MeclErrBalnRate[leg_index * 4 + 2][stepCnt] * MeclErr[leg_index * 4 + 2] * MeclErrUnit;
     legs.leg[leg_index].tarsus -= MeclErrBalnRate[leg_index * 4 + 3][stepCnt] * MeclErr[leg_index * 4 + 3] * MeclErrUnit;
   }
+}
+
+void Solution::leg_meclErr_balance_cb(const hexapod_msgs::LegJointsConstPtr &leg_meclErr_balance_msg)
+{
+  if (leg_meclErr_flag == true)
+    return;
+
+  if (leg_meclErr_balance_msg->coxa > 10 || leg_meclErr_balance_msg->coxa < -10)
+  {
+    ROS_WARN("Incorrect request for mechanical error. Out of range(-10°~10°)!");
+    return;
+  }
+  if (leg_meclErr_balance_msg->femur > 10 || leg_meclErr_balance_msg->femur < -10)
+  {
+    ROS_WARN("Incorrect request for mechanical error. Out of range(-10°~10°)!");
+    return;
+  }
+  if (leg_meclErr_balance_msg->tibia > 10 || leg_meclErr_balance_msg->tibia < -10)
+  {
+    ROS_WARN("Incorrect request for mechanical error. Out of range(-10°~10°)!");
+    return;
+  }
+  if (leg_meclErr_balance_msg->tarsus > 10 || leg_meclErr_balance_msg->tarsus < -10)
+  {
+    ROS_WARN("Incorrect request for mechanical error. Out of range(-10°~10°)!");
+    return;
+  }
+
+  leg_meclErr_balance.coxa = leg_meclErr_balance_msg->coxa / 180.0 * M_PI;
+  leg_meclErr_balance.femur = leg_meclErr_balance_msg->femur / 180.0 * M_PI;
+  leg_meclErr_balance.tibia = leg_meclErr_balance_msg->tibia / 180.0 * M_PI;
+  leg_meclErr_balance.tarsus = leg_meclErr_balance_msg->tarsus / 180.0 * M_PI;
+
+  leg_meclErr_flag = true;
+}
+
+void Solution::leg_prePress_confirm_cb(const std_msgs::Float64ConstPtr &prePress_confirm_msg)
+{
+  if (leg_meclErr_flag == true)
+    return;
+
+  if (prePress_confirm_msg->data < 0 || prePress_confirm_msg->data > 0.05)
+  {
+    ROS_WARN("Incorrect request for prepress length. Out of range(0~0.05m)!");
+    return;
+  }
+
+  prePress_confirm_flag = true;
+  prePress_confirm = prePress_confirm_msg->data;
+}
+
+void Solution::meclErr_balance(const int leg_index, hexapod_msgs::LegsJoints &legs)
+{
+  ROS_INFO("Correcting mechanical error...");
+  ROS_INFO("coxa: %f, femur: %f°, tibia: %f°, tarsus: %f°", leg_meclErr_balance.coxa, leg_meclErr_balance.femur, leg_meclErr_balance.tibia, leg_meclErr_balance.tarsus);
+
+  //缓存初始角度
+  hexapod_msgs::LegJoints initleg;
+  initleg.coxa = legs.leg[leg_index].coxa;
+  initleg.femur = legs.leg[leg_index].femur;
+  initleg.tibia = legs.leg[leg_index].tibia;
+  initleg.tarsus = legs.leg[leg_index].tarsus;
+
+  //用三角函数处理角度补偿
+  for (int i = 0; i < meclErr_balance_length; i++)
+  {
+    legs.leg[leg_index].coxa = -0.5 * leg_meclErr_balance.coxa * cos(M_PI * i / meclErr_balance_length) + 0.5 * leg_meclErr_balance.coxa + initleg.coxa;
+    legs.leg[leg_index].femur = -0.5 * leg_meclErr_balance.femur * cos(M_PI * i / meclErr_balance_length) + 0.5 * leg_meclErr_balance.femur + initleg.femur;
+    legs.leg[leg_index].tibia = -0.5 * leg_meclErr_balance.tibia * cos(M_PI * i / meclErr_balance_length) + 0.5 * leg_meclErr_balance.tibia + initleg.tibia;
+    legs.leg[leg_index].tarsus = -0.5 * leg_meclErr_balance.tarsus * cos(M_PI * i / meclErr_balance_length) + 0.5 * leg_meclErr_balance.tarsus + initleg.tarsus;
+    rawJointStatesStore(legs); //将角度缓存至posBuffer
+  }
+  publishPosBuffer();
+
+  //修改机械误差表MeclErrBalnRate
+  MeclErrBalnRate[leg_index * 4][stepCnt] += (leg_meclErr_balance.coxa / MeclErrUnit / MeclErr[leg_index * 4]);
+  MeclErrBalnRate[leg_index * 4 + 1][stepCnt] += (leg_meclErr_balance.femur / MeclErrUnit / MeclErr[leg_index * 4 + 1]);
+  MeclErrBalnRate[leg_index * 4 + 2][stepCnt] += (leg_meclErr_balance.tibia / MeclErrUnit / MeclErr[leg_index * 4 + 2]);
+  MeclErrBalnRate[leg_index * 4 + 3][stepCnt] += (leg_meclErr_balance.tarsus / MeclErrUnit / MeclErr[leg_index * 4 + 3]);
+
+  //保存的MeclErrBalnRate修正 MeclErrBalnRate_forSave
+  MeclErrBalnRate_forSave[leg_index * 4][stepCnt] += (leg_meclErr_balance.coxa / MeclErrUnit / MeclErr[leg_index * 4]);
+  MeclErrBalnRate_forSave[leg_index * 4 + 1][stepCnt] += (leg_meclErr_balance.femur / MeclErrUnit / MeclErr[leg_index * 4 + 1]);
+  MeclErrBalnRate_forSave[leg_index * 4 + 2][stepCnt] += (leg_meclErr_balance.tibia / MeclErrUnit / MeclErr[leg_index * 4 + 2]);
+  MeclErrBalnRate_forSave[leg_index * 4 + 3][stepCnt] += (leg_meclErr_balance.tarsus / MeclErrUnit / MeclErr[leg_index * 4 + 3]);
+
+  ROS_INFO("Correction finished");
+}
+
+void Solution::meclErr_afterPrePress_cb(const hexapod_msgs::LegJointsConstPtr &leg_meclErr_balance_msg)
+{
+  if (leg_meclErr_afterPrePress_flag == true)
+    return;
+
+  if (leg_meclErr_balance_msg->coxa > 10 || leg_meclErr_balance_msg->coxa < -10)
+  {
+    ROS_WARN("Incorrect request for mechanical error. Out of range(-10°~10°)!");
+    return;
+  }
+  if (leg_meclErr_balance_msg->femur > 10 || leg_meclErr_balance_msg->femur < -10)
+  {
+    ROS_WARN("Incorrect request for mechanical error. Out of range(-10°~10°)!");
+    return;
+  }
+  if (leg_meclErr_balance_msg->tibia > 10 || leg_meclErr_balance_msg->tibia < -10)
+  {
+    ROS_WARN("Incorrect request for mechanical error. Out of range(-10°~10°)!");
+    return;
+  }
+  if (leg_meclErr_balance_msg->tarsus > 10 || leg_meclErr_balance_msg->tarsus < -10)
+  {
+    ROS_WARN("Incorrect request for mechanical error. Out of range(-10°~10°)!");
+    return;
+  }
+
+  leg_meclErr_afterPrePress.coxa = leg_meclErr_balance_msg->coxa / 180.0 * M_PI;
+  leg_meclErr_afterPrePress.femur = leg_meclErr_balance_msg->femur / 180.0 * M_PI;
+  leg_meclErr_afterPrePress.tibia = leg_meclErr_balance_msg->tibia / 180.0 * M_PI;
+  leg_meclErr_afterPrePress.tarsus = leg_meclErr_balance_msg->tarsus / 180.0 * M_PI;
+
+  leg_meclErr_afterPrePress_flag = true;
+}
+
+void Solution::completely_prePress_balance(const int leg_index, hexapod_msgs::LegsJoints &legs)
+{
+
+  //缓存恢复后的角度
+  hexapod_msgs::LegJoints initleg;
+  initleg.coxa = legs.leg[leg_index].coxa;
+  initleg.femur = legs.leg[leg_index].femur;
+  initleg.tibia = legs.leg[leg_index].tibia;
+  initleg.tarsus = legs.leg[leg_index].tarsus;
+
+  //用三角函数处理角度补偿
+  for (int i = 0; i < meclErr_balance_length; i++)
+  {
+    legs.leg[leg_index].coxa = -0.5 * leg_meclErr_afterPrePress.coxa * cos(M_PI * i / meclErr_balance_length) + 0.5 * leg_meclErr_afterPrePress.coxa + initleg.coxa;
+    legs.leg[leg_index].femur = -0.5 * leg_meclErr_afterPrePress.femur * cos(M_PI * i / meclErr_balance_length) + 0.5 * leg_meclErr_afterPrePress.femur + initleg.femur;
+    legs.leg[leg_index].tibia = -0.5 * leg_meclErr_afterPrePress.tibia * cos(M_PI * i / meclErr_balance_length) + 0.5 * leg_meclErr_afterPrePress.tibia + initleg.tibia;
+    legs.leg[leg_index].tarsus = -0.5 * leg_meclErr_afterPrePress.tarsus * cos(M_PI * i / meclErr_balance_length) + 0.5 * leg_meclErr_afterPrePress.tarsus + initleg.tarsus;
+    rawJointStatesStore(legs); //将角度缓存至posBuffer
+  }
+  publishPosBuffer();
+
+  ROS_INFO("Mechanical balance for completely prepress...");
+}
+
+void Solution::reset_prePress_balance(const int leg_index, const int reset_length, hexapod_msgs::LegsJoints &legs, hexapod_msgs::LegsJoints &initLegs)
+{
+  hexapod_msgs::LegJoints amplitude;
+  amplitude.coxa = legs.leg[leg_index].coxa - initLegs.leg[leg_index].coxa;
+  amplitude.femur = legs.leg[leg_index].femur - initLegs.leg[leg_index].femur;
+  amplitude.tibia = legs.leg[leg_index].tibia - initLegs.leg[leg_index].tibia;
+  amplitude.tarsus = legs.leg[leg_index].tarsus - initLegs.leg[leg_index].tarsus;
+
+  for(int i = 0; i < reset_length; i++)
+  {
+    legs.leg[leg_index].coxa = 0.5 * amplitude.coxa * cos(M_PI * i / reset_length) + 0.5 * amplitude.coxa + initLegs.leg[leg_index].coxa;
+    legs.leg[leg_index].femur = 0.5 * amplitude.femur * cos(M_PI * i / reset_length) + 0.5 * amplitude.femur + initLegs.leg[leg_index].femur;
+    legs.leg[leg_index].tibia = 0.5 * amplitude.tibia * cos(M_PI * i / reset_length) + 0.5 * amplitude.tibia + initLegs.leg[leg_index].tibia;
+    legs.leg[leg_index].tarsus = 0.5 * amplitude.tarsus * cos(M_PI * i / reset_length) + 0.5 * amplitude.tarsus + initLegs.leg[leg_index].tarsus;
+    rawJointStatesStore(legs); //将角度缓存至posBuffer
+  }
+  publishPosBuffer();
+
+  ROS_INFO("Reset mechanical balance for completely prepress");
+}
+
+void Solution::saveMeclBalance()
+{
+  std::ofstream meclBalnText;
+  meclBalnText.open("/home/quan/hexapod_service_ws/src/climb2wall/src/BigHexBalance.txt");
+  for(int i = 0; i < 24; i++)
+  {
+    meclBalnText<<"JOINT"<<i+1<<"_MECHANICAL_ERROR_BALANCE_RATE: [";
+    for(int j = 0; j < MeclErrBalnRate_forSave[0].size(); j++)
+    {
+      meclBalnText<<MeclErrBalnRate_forSave[i][j]<<",";
+    }
+    meclBalnText<<"]"<<std::endl;
+  }
+  meclBalnText.close();
+  ROS_INFO("Mechanical error balance rate have been saved to BigHexBalance.txt");
 }

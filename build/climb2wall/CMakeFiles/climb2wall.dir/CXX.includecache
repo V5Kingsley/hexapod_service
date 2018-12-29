@@ -306,10 +306,6 @@ ros/builtin_message_traits.h
 ros/message_operations.h
 -
 
-/home/quan/hexapod_service_ws/src/climb2wall/src/climb2wall.cpp
-solution.h
-/home/quan/hexapod_service_ws/src/climb2wall/src/solution.h
-
 /home/quan/hexapod_service_ws/src/climb2wall/src/define.h
 
 /home/quan/hexapod_service_ws/src/climb2wall/src/solution.cpp
@@ -346,6 +342,8 @@ sensor_msgs/JointState.h
 link_com/hexcom.h
 -
 link_com/heartbag.h
+-
+fstream
 -
 
 /opt/ros/indigo/include/XmlRpcDecl.h

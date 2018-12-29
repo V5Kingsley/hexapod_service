@@ -152,6 +152,19 @@ Control::Control(const std::string name, bool spin_thread) : hexapod_client_(nam
   ros::param::get("MECL_RECOVER_CYCLE_LENGTH", meclRecoverLength);
   ros::param::get("PREPRESS", PREPRESS);
   ros::param::get("PREPRESS_CYCLE_LENGTH", PREPRESS_CYCLE_LENGTH);
+
+  ROS_INFO("*********************************");
+  ROS_INFO("         WeLCH-CLIMBING          ");
+  if(MACHINE == 1)
+    ROS_INFO(" Machine/Simulation: Machine    ");
+  else
+    ROS_INFO(" Machine/Simulation: Simulation ");
+  if(STICK ==1 )
+    ROS_INFO("      Stick Control: ON         ");
+  else
+    ROS_INFO("      Stick Control: OFF        ");
+  ROS_INFO("          by Kingsley             ");
+  ROS_INFO("**********************************");
 }
 
 //订阅发布的速度信息，处理上下限速度信息.

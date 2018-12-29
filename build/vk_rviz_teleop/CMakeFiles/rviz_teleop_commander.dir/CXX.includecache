@@ -6,10 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/quan/hexapod_service_ws/build/vk_rviz_teleop/src/moc_teleop_pad.cxx
-../../../src/vk_rviz_teleop/src/teleop_pad.h
-/home/quan/hexapod_service_ws/src/vk_rviz_teleop/src/teleop_pad.h
-
 /home/quan/hexapod_service_ws/src/vk_rviz_teleop/include/define.h
 
 /home/quan/hexapod_service_ws/src/vk_rviz_teleop/include/hexapodserviceAction.h

@@ -25,7 +25,7 @@ enum conChoice
 //变量定义
 serial::Serial ser;																			//声明串口对象
 std_msgs::String heart_bag;															//存储接收数据
-int pwm;																								//存储命令变量
+int pwm = 80;																								//存储命令变量
 //char io[8] = {'0', '0', '0', '0', '0', '0', '0', '\0'}; //最后一位为截止符，帮助确定长度
 int io[7] = {0};
 char i2c[3] = {'0', '0', '\0'};
@@ -200,7 +200,7 @@ int main(int argc, char **argv)
 				{
 					hb.io[i] = io[i];
 				}
-				hb.kpa = -60;
+				hb.kpa = -pwm;
 					heart_pub.publish(hb); //发布心跳包
 				
 				heart_bag.data.clear(); //变量清零

@@ -20,9 +20,9 @@ int main(int argc, char **argv)
   int prePress_cycle = 1200; //预压周期
   int meclErrRecover_cycle = 800;  //机械误差恢复周期
 
-  double roll_t = 0.0;  //终止俯仰角
-  double roll_0 = 0.0;  //初始俯仰角
-  double prePress;  //预压距离
+  float roll_t = 0.0;  //终止俯仰角
+  float roll_0 = 0.0;  //初始俯仰角
+  float prePress;  //预压距离
 
   /*****************平面调整位姿*********************************/ //stepCnt = 0
   //计算关节角度全为0时的初始位姿态
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
   Solution.stepCnt++;
 
   /*********************抬第二腿前往后平移********************************/ //stepCnt = 4
-  cycle_length = 2800;        //3500
+  cycle_length = 2800;        //2800
   double translation = -0.1; //沿y轴平移-0.1
   double height = 0;         //沿z轴平移0
   Solution.publishRollTranslationLift(GROUND, roll_t, roll_0, translation, height, legs, cycle_length);
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 
   //二腿预压///
   prePress = 0.015;
-  Solution.stepCnt-=2;   //legs的角度恢复上一步保持的误差值
+  Solution.stepCnt -= 2;   //legs的角度恢复上一步保持的误差值
   Solution.resetMeclErr(legs);   //legs的角度恢复上一步保持的误差值
   Solution.leg2SpecialPrePress(1, prePress, roll_t, prePress_cycle, legs);  //二腿预压特殊处理，修正了抬腿时预留的0.02距离
   Solution.meclErrRecover(meclErrRecover_cycle, legs);  //此处的误差回复的是上一步的误差
@@ -393,4 +393,6 @@ int main(int argc, char **argv)
     Solution.stepCnt++;
   }
 #endif
+
+  Solution.saveMeclBalance();
 }

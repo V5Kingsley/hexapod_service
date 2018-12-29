@@ -21,9 +21,9 @@
 #include <sensor_msgs/JointState.h>
 #include <link_com/hexcom.h>
 #include <link_com/heartbag.h>
-
+ 
 #define MACHINE 1    //仿真和实体机标志位。置0时为gazebo仿真，置1时为实体机（发送角度控制给服务器）
-#define STICK 1 //吸盘控制。置0时取消，置1开启
+#define STICK 0 //吸盘控制。置0时取消，置1开启
 
 enum{HEX2CRAB, CRAB2HEX};
 
@@ -184,17 +184,21 @@ private:
 
   std::vector< std::vector<float> > hex2crabMeclErrBalnRate;
   std::vector<float> hex2crabMeclErrBalnRateLeg1;
+  std::vector<float> hex2crabMeclErrBalnRateLeg2;
   std::vector<float> hex2crabMeclErrBalnRateLeg3;
   std::vector<float> hex2crabMeclErrBalnRateLeg4;
+  std::vector<float> hex2crabMeclErrBalnRateLeg5;
   std::vector<float> hex2crabMeclErrBalnRateLeg6;
 
   std::vector< std::vector<float> > crab2hexMeclErrBalnRate;
   std::vector<float> crab2hexMeclErrBalnRateLeg1;
+  std::vector<float> crab2hexMeclErrBalnRateLeg2;
   std::vector<float> crab2hexMeclErrBalnRateLeg3;
   std::vector<float> crab2hexMeclErrBalnRateLeg4;
+  std::vector<float> crab2hexMeclErrBalnRateLeg5;
   std::vector<float> crab2hexMeclErrBalnRateLeg6;
   
-  void modeTransmPrePress(const int MODE, const int modeTransmStep, const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs);
+  void modeTransmPrePress(const int MODE, const int leg_index, const double &prePress, const int &cycle_length, hexapod_msgs::LegsJoints &legs);
   void publishModeTransmPrePressPos();
   bool modeTransmPrePressFeedDrivers();
 };

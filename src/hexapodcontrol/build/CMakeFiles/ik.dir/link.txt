@@ -1,0 +1,1 @@
+/usr/bin/g++-4.8 -fPIC -g  -shared -Wl,-soname,libik.so -o devel/lib/libik.so CMakeFiles/ik.dir/src/ik.cpp.o 

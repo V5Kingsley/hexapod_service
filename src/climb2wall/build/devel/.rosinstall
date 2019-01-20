@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/v5lab/hexapod_service_ws/src/climb2wall/build/devel/setup.sh

@@ -1,0 +1,8 @@
+prefix=/home/sun/hexapod_service_ws/install
+
+Name: hexapod_gazebo_description
+Description: Description of hexapod_gazebo_description
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/sun/hexapod_service_ws/install/lib 
+Requires: 

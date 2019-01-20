@@ -1,0 +1,8 @@
+prefix=/home/sun/hexapod_service_ws/install
+
+Name: climb2wall
+Description: Description of climb2wall
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/sun/hexapod_service_ws/install/lib 
+Requires: 

@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC   -shared -Wl,-soname,libwall_gait.so -o /home/sun/hexapod_service_ws/devel/lib/libwall_gait.so CMakeFiles/wall_gait.dir/src/gait.cpp.o 

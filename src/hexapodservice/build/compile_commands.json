@@ -1,0 +1,52 @@
+[
+{
+  "directory": "/home/quan/hexapod_service_ws/src/hexapodservice/build",
+  "command": "/usr/bin/gcc-4.8 -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapodservice\\\" -Dsimplemotion_EXPORTS -I/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include -I/opt/ros/indigo/include -I/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library -I/home/quan/hexapod_service_ws/devel/include  -g -fPIC   -std=c++11 -o CMakeFiles/simplemotion.dir/src/simplemotion_library/bufferedmotion.c.o   -c /home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/bufferedmotion.c",
+  "file": "/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/bufferedmotion.c"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/hexapodservice/build",
+  "command": "/usr/bin/gcc-4.8 -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapodservice\\\" -Dsimplemotion_EXPORTS -I/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include -I/opt/ros/indigo/include -I/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library -I/home/quan/hexapod_service_ws/devel/include  -g -fPIC   -std=c++11 -o CMakeFiles/simplemotion.dir/src/simplemotion_library/busdevice.c.o   -c /home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/busdevice.c",
+  "file": "/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/busdevice.c"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/hexapodservice/build",
+  "command": "/usr/bin/gcc-4.8 -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapodservice\\\" -Dsimplemotion_EXPORTS -I/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include -I/opt/ros/indigo/include -I/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library -I/home/quan/hexapod_service_ws/devel/include  -g -fPIC   -std=c++11 -o CMakeFiles/simplemotion.dir/src/simplemotion_library/rs232.c.o   -c /home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/rs232.c",
+  "file": "/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/rs232.c"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/hexapodservice/build",
+  "command": "/usr/bin/gcc-4.8 -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapodservice\\\" -Dsimplemotion_EXPORTS -I/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include -I/opt/ros/indigo/include -I/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library -I/home/quan/hexapod_service_ws/devel/include  -g -fPIC   -std=c++11 -o CMakeFiles/simplemotion.dir/src/simplemotion_library/simplemotion.c.o   -c /home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/simplemotion.c",
+  "file": "/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/simplemotion.c"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/hexapodservice/build",
+  "command": "/usr/bin/gcc-4.8 -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapodservice\\\" -Dsimplemotion_EXPORTS -I/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include -I/opt/ros/indigo/include -I/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library -I/home/quan/hexapod_service_ws/devel/include  -g -fPIC   -std=c++11 -o CMakeFiles/simplemotion.dir/src/simplemotion_library/smtest.c.o   -c /home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/smtest.c",
+  "file": "/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/smtest.c"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/hexapodservice/build",
+  "command": "/usr/bin/gcc-4.8 -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapodservice\\\" -Dsimplemotion_EXPORTS -I/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include -I/opt/ros/indigo/include -I/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library -I/home/quan/hexapod_service_ws/devel/include  -g -fPIC   -std=c++11 -o CMakeFiles/simplemotion.dir/src/simplemotion_library/sm_consts.c.o   -c /home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/sm_consts.c",
+  "file": "/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library/sm_consts.c"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/hexapodservice/build",
+  "command": "/usr/bin/g++-4.8  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapodservice\\\" -I/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include -I/opt/ros/indigo/include -I/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library -I/home/quan/hexapod_service_ws/devel/include  -g   -std=c++11 -o CMakeFiles/hexapodservice.dir/src/hexapodservice.cpp.o -c /home/quan/hexapod_service_ws/src/hexapodservice/src/hexapodservice.cpp",
+  "file": "/home/quan/hexapod_service_ws/src/hexapodservice/src/hexapodservice.cpp"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/hexapodservice/build",
+  "command": "/usr/bin/g++-4.8  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapodservice\\\" -I/home/quan/hexapod_service_ws/src/hexapodservice/build/devel/include -I/opt/ros/indigo/include -I/home/quan/hexapod_service_ws/src/hexapodservice/src/simplemotion_library -I/home/quan/hexapod_service_ws/devel/include  -g   -std=c++11 -o CMakeFiles/smcontrol_client.dir/src/smcontrolclient.cpp.o -c /home/quan/hexapod_service_ws/src/hexapodservice/src/smcontrolclient.cpp",
+  "file": "/home/quan/hexapod_service_ws/src/hexapodservice/src/smcontrolclient.cpp"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/hexapodservice/build/gtest",
+  "command": "/usr/bin/g++-4.8  -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgtest_main_EXPORTS -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -std=c++11 -o CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /usr/src/gtest/src/gtest_main.cc",
+  "file": "/usr/src/gtest/src/gtest_main.cc"
+},
+{
+  "directory": "/home/quan/hexapod_service_ws/src/hexapodservice/build/gtest",
+  "command": "/usr/bin/g++-4.8  -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgtest_EXPORTS -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -std=c++11 -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /usr/src/gtest/src/gtest-all.cc",
+  "file": "/usr/src/gtest/src/gtest-all.cc"
+}
+]

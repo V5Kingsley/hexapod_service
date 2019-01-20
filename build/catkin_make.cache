@@ -1,0 +1,2 @@
+climb2wall:hexapod_gazebo_description:hexapod_msgs:hexapod_wall_control:hexapodcontrol:hexapodservice:link_com
+-DCATKIN_DEVEL_PREFIX=/home/sun/hexapod_service_ws/devel -DCMAKE_INSTALL_PREFIX=/home/sun/hexapod_service_ws/install -G Unix Makefiles

@@ -1,0 +1,154 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_0a0be/fast"
+/usr/bin/make -f CMakeFiles/cmTC_0a0be.dir/build.make CMakeFiles/cmTC_0a0be.dir/build
+make[1]: Entering directory '/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_0a0be.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_0a0be.dir/CheckSymbolExists.c.o   -c /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_0a0be
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0a0be.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_0a0be.dir/CheckSymbolExists.c.o  -o cmTC_0a0be -rdynamic 
+CMakeFiles/cmTC_0a0be.dir/CheckSymbolExists.c.o：在函数‘main’中：
+CheckSymbolExists.c:(.text+0x16)：对‘pthread_create’未定义的引用
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_0a0be.dir/build.make:97: recipe for target 'cmTC_0a0be' failed
+make[1]: *** [cmTC_0a0be] Error 1
+make[1]: Leaving directory '/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_0a0be/fast' failed
+make: *** [cmTC_0a0be/fast] Error 2
+
+File /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_59efb/fast"
+/usr/bin/make -f CMakeFiles/cmTC_59efb.dir/build.make CMakeFiles/cmTC_59efb.dir/build
+make[1]: Entering directory '/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_59efb.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_59efb.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_59efb
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_59efb.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_59efb.dir/CheckFunctionExists.c.o  -o cmTC_59efb -rdynamic -lpthreads 
+/usr/bin/ld: 找不到 -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_59efb.dir/build.make:97: recipe for target 'cmTC_59efb' failed
+make[1]: *** [cmTC_59efb] Error 1
+make[1]: Leaving directory '/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_59efb/fast' failed
+make: *** [cmTC_59efb/fast] Error 2
+
+
+Determining if the Q_WS_WIN exist failed with the following output:
+Change Dir: /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_05562/fast"
+/usr/bin/make -f CMakeFiles/cmTC_05562.dir/build.make CMakeFiles/cmTC_05562.dir/build
+make[1]: Entering directory '/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_05562.dir/CheckSymbolExists.cxx.o
+/usr/bin/c++    -I/usr/include/qt4   -o CMakeFiles/cmTC_05562.dir/CheckSymbolExists.cxx.o -c /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx
+/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx: In function ‘int main(int, char**)’:
+/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:8:19: error: ‘Q_WS_WIN’ was not declared in this scope
+   return ((int*)(&Q_WS_WIN))[argc];
+                   ^
+CMakeFiles/cmTC_05562.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_05562.dir/CheckSymbolExists.cxx.o' failed
+make[1]: *** [CMakeFiles/cmTC_05562.dir/CheckSymbolExists.cxx.o] Error 1
+make[1]: Leaving directory '/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_05562/fast' failed
+make: *** [cmTC_05562/fast] Error 2
+
+File /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:
+/* */
+#include <QtCore/qglobal.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef Q_WS_WIN
+  return ((int*)(&Q_WS_WIN))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the Q_WS_QWS exist failed with the following output:
+Change Dir: /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ee159/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ee159.dir/build.make CMakeFiles/cmTC_ee159.dir/build
+make[1]: Entering directory '/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_ee159.dir/CheckSymbolExists.cxx.o
+/usr/bin/c++    -I/usr/include/qt4   -o CMakeFiles/cmTC_ee159.dir/CheckSymbolExists.cxx.o -c /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx
+/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx: In function ‘int main(int, char**)’:
+/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:8:19: error: ‘Q_WS_QWS’ was not declared in this scope
+   return ((int*)(&Q_WS_QWS))[argc];
+                   ^
+CMakeFiles/cmTC_ee159.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_ee159.dir/CheckSymbolExists.cxx.o' failed
+make[1]: *** [CMakeFiles/cmTC_ee159.dir/CheckSymbolExists.cxx.o] Error 1
+make[1]: Leaving directory '/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_ee159/fast' failed
+make: *** [cmTC_ee159/fast] Error 2
+
+File /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:
+/* */
+#include <QtCore/qglobal.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef Q_WS_QWS
+  return ((int*)(&Q_WS_QWS))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the Q_WS_MAC exist failed with the following output:
+Change Dir: /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ea867/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ea867.dir/build.make CMakeFiles/cmTC_ea867.dir/build
+make[1]: Entering directory '/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_ea867.dir/CheckSymbolExists.cxx.o
+/usr/bin/c++    -I/usr/include/qt4   -o CMakeFiles/cmTC_ea867.dir/CheckSymbolExists.cxx.o -c /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx
+/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx: In function ‘int main(int, char**)’:
+/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:8:19: error: ‘Q_WS_MAC’ was not declared in this scope
+   return ((int*)(&Q_WS_MAC))[argc];
+                   ^
+CMakeFiles/cmTC_ea867.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_ea867.dir/CheckSymbolExists.cxx.o' failed
+make[1]: *** [CMakeFiles/cmTC_ea867.dir/CheckSymbolExists.cxx.o] Error 1
+make[1]: Leaving directory '/home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_ea867/fast' failed
+make: *** [cmTC_ea867/fast] Error 2
+
+File /home/sun/hexapod_service_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:
+/* */
+#include <QtCore/qglobal.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef Q_WS_MAC
+  return ((int*)(&Q_WS_MAC))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+

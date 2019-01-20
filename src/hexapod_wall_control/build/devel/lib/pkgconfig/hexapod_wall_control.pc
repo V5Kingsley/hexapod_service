@@ -1,0 +1,8 @@
+prefix=/home/sun/hexapod_service_ws/src/hexapod_wall_control/build/devel
+
+Name: hexapod_wall_control
+Description: Description of hexapod_wall_control
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/sun/hexapod_service_ws/src/hexapod_wall_control/build/devel/lib 
+Requires: 

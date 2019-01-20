@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -g  -shared -Wl,-soname,libwall_gait.so -o devel/lib/libwall_gait.so CMakeFiles/wall_gait.dir/src/gait.cpp.o 

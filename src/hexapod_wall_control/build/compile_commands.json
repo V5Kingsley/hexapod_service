@@ -1,0 +1,57 @@
+[
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build",
+  "command": "/usr/bin/c++   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapod_wall_control\\\" -Dwall_gait_EXPORTS -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/home/sun/hexapod_service_ws/devel/include  -g -fPIC   -std=c++11 -o CMakeFiles/wall_gait.dir/src/gait.cpp.o -c /home/sun/hexapod_service_ws/src/hexapod_wall_control/src/gait.cpp",
+  "file": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/src/gait.cpp"
+},
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build",
+  "command": "/usr/bin/c++   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapod_wall_control\\\" -Dwall_ik_EXPORTS -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/home/sun/hexapod_service_ws/devel/include  -g -fPIC   -std=c++11 -o CMakeFiles/wall_ik.dir/src/ik.cpp.o -c /home/sun/hexapod_service_ws/src/hexapod_wall_control/src/ik.cpp",
+  "file": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/src/ik.cpp"
+},
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build",
+  "command": "/usr/bin/c++   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapod_wall_control\\\" -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/home/sun/hexapod_service_ws/devel/include  -g   -std=c++11 -o CMakeFiles/hexapod_wall_control.dir/src/my_hexapod_controller.cpp.o -c /home/sun/hexapod_service_ws/src/hexapod_wall_control/src/my_hexapod_controller.cpp",
+  "file": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/src/my_hexapod_controller.cpp"
+},
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build",
+  "command": "/usr/bin/c++   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_PACKAGE_NAME=\\\"hexapod_wall_control\\\" -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/home/sun/hexapod_service_ws/devel/include  -g   -std=c++11 -o CMakeFiles/hexapod_wall_control.dir/src/control.cpp.o -c /home/sun/hexapod_service_ws/src/hexapod_wall_control/src/control.cpp",
+  "file": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/src/control.cpp"
+},
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build/gtest",
+  "command": "/usr/bin/c++   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_EXPORTS -I/usr/src/gmock/include -I/usr/src/gmock -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -std=c++11 -o CMakeFiles/gmock.dir/usr/src/gtest/src/gtest-all.cc.o -c /usr/src/gtest/src/gtest-all.cc",
+  "file": "/usr/src/gtest/src/gtest-all.cc"
+},
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build/gtest",
+  "command": "/usr/bin/c++   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_EXPORTS -I/usr/src/gmock/include -I/usr/src/gmock -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -std=c++11 -o CMakeFiles/gmock.dir/src/gmock-all.cc.o -c /usr/src/gmock/src/gmock-all.cc",
+  "file": "/usr/src/gmock/src/gmock-all.cc"
+},
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build/gtest",
+  "command": "/usr/bin/c++   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_main_EXPORTS -I/usr/src/gmock/include -I/usr/src/gmock -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -std=c++11 -o CMakeFiles/gmock_main.dir/usr/src/gtest/src/gtest-all.cc.o -c /usr/src/gtest/src/gtest-all.cc",
+  "file": "/usr/src/gtest/src/gtest-all.cc"
+},
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build/gtest",
+  "command": "/usr/bin/c++   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_main_EXPORTS -I/usr/src/gmock/include -I/usr/src/gmock -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -std=c++11 -o CMakeFiles/gmock_main.dir/src/gmock-all.cc.o -c /usr/src/gmock/src/gmock-all.cc",
+  "file": "/usr/src/gmock/src/gmock-all.cc"
+},
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build/gtest",
+  "command": "/usr/bin/c++   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_main_EXPORTS -I/usr/src/gmock/include -I/usr/src/gmock -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -std=c++11 -o CMakeFiles/gmock_main.dir/src/gmock_main.cc.o -c /usr/src/gmock/src/gmock_main.cc",
+  "file": "/usr/src/gmock/src/gmock_main.cc"
+},
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build/gtest/gtest",
+  "command": "/usr/bin/c++   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgtest_EXPORTS -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -std=c++11 -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /usr/src/gtest/src/gtest-all.cc",
+  "file": "/usr/src/gtest/src/gtest-all.cc"
+},
+{
+  "directory": "/home/sun/hexapod_service_ws/src/hexapod_wall_control/build/gtest/gtest",
+  "command": "/usr/bin/c++   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgtest_main_EXPORTS -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -std=c++11 -o CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /usr/src/gtest/src/gtest_main.cc",
+  "file": "/usr/src/gtest/src/gtest_main.cc"
+}
+]

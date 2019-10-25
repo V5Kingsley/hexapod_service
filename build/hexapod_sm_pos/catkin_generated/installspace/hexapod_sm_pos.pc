@@ -1,8 +1,0 @@
-prefix=/home/quan/hexapod_service_ws/install
-
-Name: hexapod_sm_pos
-Description: Description of hexapod_sm_pos
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/quan/hexapod_service_ws/install/lib 
-Requires: 

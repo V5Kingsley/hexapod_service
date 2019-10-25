@@ -1,8 +1,0 @@
-prefix=/home/quan/hexapod_service_ws/install
-
-Name: link_com
-Description: Description of link_com
-Version: 0.0.0
-Cflags: -I/home/quan/hexapod_service_ws/install/include
-Libs: -L/home/quan/hexapod_service_ws/install/lib -llink_com
-Requires: message_runtime roscpp rospy std_msgs

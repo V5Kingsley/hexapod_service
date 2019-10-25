@@ -1,2 +1,0 @@
-climb2wall:hexapod_gazebo_description:hexapod_msgs:hexapod_sm_pos:hexapod_wall_control:hexapodcontrol:hexapodservice:link_com:vk_rviz_teleop
--DCATKIN_DEVEL_PREFIX=/home/quan/hexapod_service_ws/devel -DCMAKE_INSTALL_PREFIX=/home/quan/hexapod_service_ws/install -G Unix Makefiles

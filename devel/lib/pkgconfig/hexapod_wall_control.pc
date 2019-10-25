@@ -1,8 +1,0 @@
-prefix=/home/quan/hexapod_service_ws/devel
-
-Name: hexapod_wall_control
-Description: Description of hexapod_wall_control
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/quan/hexapod_service_ws/devel/lib 
-Requires: 

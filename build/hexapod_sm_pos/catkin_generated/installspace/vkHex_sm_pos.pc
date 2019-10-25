@@ -1,8 +1,0 @@
-prefix=/home/quan/hexapod_service_ws/install
-
-Name: vkHex_sm_pos
-Description: Description of vkHex_sm_pos
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/quan/hexapod_service_ws/install/lib 
-Requires: 
